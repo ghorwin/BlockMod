@@ -15,6 +15,8 @@ INCLUDEPATH = \
 	../../src \
 	../../../BlockMod/src
 
+DEPENDPATH = $${INCLUDEPATH}
+
 LIBS += -L../../../lib$${DIR_PREFIX} \
 	-lBlockMod
 

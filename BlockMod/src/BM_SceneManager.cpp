@@ -22,7 +22,7 @@ void SceneManager::setNetwork(Network & network) {
 	// create new graphics items
 	for (int i=0; i<network.m_blocks.count(); ++i) {
 		BlockItem * item = new BlockItem;
-		item->setFromBlock(network.m_blocks[i]);
+//		item->setFromBlock(network.m_blocks[i]);
 		addItem(item);
 		m_items.append(item);
 	}
@@ -30,7 +30,7 @@ void SceneManager::setNetwork(Network & network) {
 	// create new graphics items for connectors
 	for (int i=0; i<network.m_connectors.count(); ++i) {
 		QGraphicsPolygonItem * item = new QGraphicsPolygonItem;
-		item->setPolygon( QPolygonF( network.m_connectors[i].m_points ) );
+//		item->setPolygon( QPolygonF( network.m_connectors[i].m_points ) );
 		item->setBrush(Qt::NoBrush);
 		item->setPen( QPen(Qt::black) );
 		item->setZValue(1);

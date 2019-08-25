@@ -14,21 +14,13 @@
 
 namespace BLOCKMOD {
 
-Network::Network() :
-	m_scene(new QGraphicsScene())
+Network::Network()
 {
 }
 
 
-Network::~Network() {
-	delete m_scene;
-	m_scene = nullptr;
-}
-
-
-
 void Network::readXML(const QString & fname) {
-#if 0
+
 	QFile xmlFile(fname);
 	if (!xmlFile.open(QIODevice::ReadOnly | QFile::Text))
 		throw std::runtime_error("Cannot read file.");
@@ -72,12 +64,11 @@ void Network::readXML(const QString & fname) {
 	if (reader.hasError()) {
 		throw std::runtime_error( reader.errorString().toStdString() );
 	}
-#endif
 }
 
 
 void Network::writeXML(const QString & fname) const {
-#if 0
+
 	QFile xmlFile(fname);
 	if (!xmlFile.open(QIODevice::WriteOnly | QFile::Truncate | QFile::Text))
 		throw std::runtime_error("Cannot create output file.");
@@ -110,7 +101,6 @@ void Network::writeXML(const QString & fname) const {
 	stream.writeEndElement(); // BlockMod
 
 	stream.writeEndDocument();
-#endif
 }
 
 

@@ -10,7 +10,6 @@
 #include <BM_BlockItem.h>
 
 class QXmlStreamReader;
-class QGraphicsScene;
 
 namespace BLOCKMOD {
 
@@ -23,31 +22,13 @@ class Network {
 public:
 	/*! Default C'tor. */
 	Network();
-	/*! D'tor, cleanup of allocated resources. */
-	~Network();
 
 	/*! Reads network from file. */
 	void readXML(const QString & fname);
 	/*! Writes network to file. */
 	void writeXML(const QString & fname) const;
-
 	/*! Flattens all ID names of sockets and blocks and checks for duplicates. */
 	void checkNames() const;
-
-	/*! Adds a new block to the network. */
-	void addBlock(int gridX, int gridY);
-
-	QGraphicsScene * scene() { return m_scene; }
-
-
-private:
-	Network(const Network&) = delete;
-	Network & operator=(const Network&) = delete;
-
-	void readBlocks(QXmlStreamReader & reader);
-
-	/*! The graphics scene belonging to this network. */
-	QGraphicsScene		*m_scene;
 
 	/*! List of all blocks in the network. */
 	QList<Block>		m_blocks;
@@ -57,6 +38,10 @@ private:
 		block-id and socket-id).
 	*/
 	QList<Connector>	m_connectors;
+
+private:
+
+	void readBlocks(QXmlStreamReader & reader);
 };
 
 } // namespace BLOCKMOD
