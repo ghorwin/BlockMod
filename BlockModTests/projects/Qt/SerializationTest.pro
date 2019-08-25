@@ -4,11 +4,12 @@
 # ----------------------------------------------------
 
 TARGET = SerializationTest
+TEMPLATE = app
 
+# common project configurations, source this file after TEMPLATE was specified
+include( ../../../BlockMod/projects/Qt/BlockMod.pri )
 
 QT += widgets svg network xml printsupport
-
-TEMPLATE = app
 
 CONFIG(debug, debug|release) {
 	OBJECTS_DIR = debug
@@ -26,7 +27,7 @@ INCLUDEPATH = \
 	../../src \
 	../../../BlockMod/src
 
-LIBS += -L../../../lib \
+LIBS += -L../../../lib$${DIR_PREFIX} \
 	-lBlockMod
 
 SOURCES += \
