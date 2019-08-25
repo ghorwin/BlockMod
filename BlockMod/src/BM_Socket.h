@@ -7,8 +7,6 @@
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
-#include "BM_Entity.h"
-
 namespace BLOCKMOD {
 
 /*! Stores properties of a Socket.
@@ -18,7 +16,7 @@ namespace BLOCKMOD {
 
 	Sockets are owned by parent block and do not exist in separate socket list.
 */
-class Socket : public Entity {
+class Socket {
 public:
 	Socket() {}
 
@@ -30,12 +28,21 @@ public:
 	/*! Dumps out content of block to stream writer. */
 	void writeXML(QXmlStreamWriter & writer) const;
 
+	QString			m_name;
+
 	/*! Position (connection point) of Socket.
 		Relative to parent block.
 	*/
 	QPointF			m_pos;
 
+	/*! Orientation defines together with the position relative to the parent block, which
+		direction the block points to and how to compute the first connector start coordinate.
+
+		Example: m_orientation = Qt::Horizontal and m_pos.x() != 0 --> connector at the right side of block pointing to the right
+	*/
 	Qt::Orientation	m_orientation;
+
+	/*! If true, painted as a socket, if false, painted as an outgoing arrow. */
 	bool			m_inlet;
 };
 

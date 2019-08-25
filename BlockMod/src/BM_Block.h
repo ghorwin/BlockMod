@@ -9,16 +9,17 @@
 #include <QXmlStreamWriter>
 
 #include "BM_Socket.h"
-#include "BM_Entity.h"
 
 namespace BLOCKMOD {
+
+class BlockItem;
 
 /*! Stores properties of a block.
 
 	* appearance properties of block
 	* position of block
 */
-class Block : public Entity {
+class Block {
 public:
 	Block() {}
 
@@ -31,6 +32,9 @@ public:
 
 	/*! Dumps out content of block to stream writer. */
 	void writeXML(QXmlStreamWriter & writer) const;
+
+
+	QString			m_name;
 
 	/*! Position (top left corner) of block. */
 	QPointF			m_pos;

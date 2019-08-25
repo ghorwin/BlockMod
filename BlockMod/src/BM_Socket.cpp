@@ -8,7 +8,7 @@
 namespace BLOCKMOD {
 
 Socket::Socket(const QString & name) :
-	Entity(name),
+	m_name(name),
 	m_pos(0,0),
 	m_orientation(Qt::Horizontal)
 {

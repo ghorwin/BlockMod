@@ -9,6 +9,7 @@
 namespace BLOCKMOD {
 
 void Connector::readXML(QXmlStreamReader & reader) {
+#if 0
 	Q_ASSERT(reader.isStartElement());
 	// read attributes of Connector element
 	m_name = reader.attributes().value("name").toString();
@@ -42,10 +43,12 @@ void Connector::readXML(QXmlStreamReader & reader) {
 				break;// done with XML tag
 		}
 	}
+#endif
 }
 
 
 void Connector::writeXML(QXmlStreamWriter & writer) const {
+#if 0
 	writer.writeStartElement("Connector");
 	writer.writeAttribute("name", m_name);
 	if (!m_sourceSocket.isEmpty())
@@ -64,6 +67,7 @@ void Connector::writeXML(QXmlStreamWriter & writer) const {
 	}
 
 	writer.writeEndElement();
+#endif
 }
 
 } // namespace BLOCKMOD

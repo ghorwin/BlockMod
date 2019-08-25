@@ -7,7 +7,10 @@
 #include <BM_Socket.h>
 #include <BM_Connector.h>
 
+#include <BM_BlockItem.h>
+
 class QXmlStreamReader;
+class QGraphicsScene;
 
 namespace BLOCKMOD {
 
@@ -31,16 +34,29 @@ public:
 	/*! Flattens all ID names of sockets and blocks and checks for duplicates. */
 	void checkNames() const;
 
+	/*! Adds a new block to the network. */
+	void addBlock(int gridX, int gridY);
+
+	QGraphicsScene * scene() { return m_scene; }
+
+
+private:
+	Network(const Network&) = delete;
+	Network & operator=(const Network&) = delete;
+
+	void readBlocks(QXmlStreamReader & reader);
+
+	/*! The graphics scene belonging to this network. */
+	QGraphicsScene		*m_scene;
+
 	/*! List of all blocks in the network. */
 	QList<Block>		m_blocks;
 
-	/*! List of all connectors in the network. */
+	/*! List of all connectors in the network.
+		Connectors are always associated with sockets (referenced via
+		block-id and socket-id).
+	*/
 	QList<Connector>	m_connectors;
-
-private:
-	void readBlocks(QXmlStreamReader & reader);
-	void readSockets(QXmlStreamReader & reader);
-
 };
 
 } // namespace BLOCKMOD
