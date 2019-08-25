@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QFont>
 #include <QLocale>
+#include <QtGlobal>
 
 #include <memory>
 #include <iostream>
@@ -8,16 +9,16 @@
 #include "BlockModAppMainWindow.h"
 #include "BlockModAppDebugApplication.h"
 
-void qDebugMsgHandler(QtMsgType type, const char *msg) {
+void qDebugMsgHandler(QtMsgType type, const QMessageLogContext & context, const QString & msg) {
 	(void) type;
-	std::cout << msg << std::endl;
+	std::cout << "[" << context.function << "] " << msg.toStdString() << std::endl;
 }
 
 
 int main(int argc, char *argv[]) {
 	BlockModAppDebugApplication a(argc, argv);
 
-	qInstallMsgHandler(qDebugMsgHandler);
+	qInstallMessageHandler(qDebugMsgHandler);
 
 	// *** Locale setup for Unix/Linux ***
 #if defined(Q_OS_UNIX)

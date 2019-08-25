@@ -38,6 +38,9 @@ ENDMACRO(SHOW_VARIABLE)
 # Uncomment this to enable detailed make output
 set( CMAKE_VERBOSE_MAKEFILE OFF )
 
+# automatically add CMAKE_CURRENT_SOURCE_DIR and CMAKE_CURRENT_BINARY_DIR to the include directories in every processed CMakeLists.txt
+set( CMAKE_INCLUDE_CURRENT_DIR ON )
+
 # Hide some more cache variables to keep things tidy
 MARK_AS_ADVANCED(CMAKE_BACKWARDS_COMPATIBILITY)
 MARK_AS_ADVANCED(EXECUTABLE_OUTPUT_PATH LIBRARY_OUTPUT_PATH)

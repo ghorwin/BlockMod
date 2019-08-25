@@ -8,7 +8,7 @@ bool BlockModAppDebugApplication::notify( QObject *recv, QEvent *e ) {
 		return QApplication::notify( recv, e );
 	}
 	catch (std::exception &ex) {
-		std::cerr << ex.what() << std::cerr;
+		std::cerr << ex.what() << std::endl;
 	}
 
 	return false;

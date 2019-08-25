@@ -1,37 +1,24 @@
 # ----------------------------------------------------
-# Project for BlockModApp Test User Interface
+# Project for BlockModDemo Test User Interface
 # remember to set DYLD_FALLBACK_LIBRARY_PATH on MacOSX
 # ----------------------------------------------------
 
-TARGET = BlockModApp
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-QT += network
-
+TARGET = BlockModDemo
 TEMPLATE = app
 
-CONFIG(debug, debug|release) {
-	OBJECTS_DIR = debug
-	DESTDIR = ../../../bin/debug
-}
-else {
-	OBJECTS_DIR = release
-	DESTDIR = ../../../bin/release
-}
+# common project configurations, source this file after TEMPLATE was specified
+include( ../../../BlockMod/projects/Qt/BlockMod.pri )
 
-MOC_DIR = moc
-UI_DIR = ui
-
+QT += widgets svg network xml printsupport
 
 INCLUDEPATH = \
 	../../src \
 	../../../BlockMod/src
 
-LIBS += -L../../../lib \
+LIBS += -L../../../lib$${DIR_PREFIX} \
 	-lBlockMod
 
-RESOURCES += ../../resources/BlockModApp.qrc
-# TRANSLATIONS += ../../resources/translations/BlockModApp_de.ts
+RESOURCES += ../../resources/BlockModDemo.qrc
 
 HEADERS += \
 	../../src/BlockModAppMainWindow.h \
