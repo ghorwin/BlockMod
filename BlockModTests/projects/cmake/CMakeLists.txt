@@ -22,22 +22,25 @@ set ( QT_LIBRARIES
 	Qt5::Concurrent # needed for qwt6
 )
 
+# collect a list of all source files within the examples directory
+file( GLOB IBK_EXAMPLE_SRCS ${PROJECT_SOURCE_DIR}/../../src/*.cpp )
 
-# build application executable for the different platforms
-if( WIN32 )
-	add_executable( SerializationTest WIN32 ${PROJECT_SOURCE_DIR}/../../src/SerializationTest.cpp )
+foreach( SRC ${IBK_EXAMPLE_SRCS} )
+	get_filename_component( EXAMPLE_FILENAME ${SRC} NAME_WE )
+	if( WIN32 )
+		add_executable( ${EXAMPLE_FILENAME}	WIN32 ${SRC} )
+	endif( WIN32 )
 
-	set(WIN_FRAMEWORKS iphlpapi EmfEngine gdiplus gdi32 user32 ole32)
+	if( UNIX )
+		add_executable( ${EXAMPLE_FILENAME}	${SRC} )
+	endif( UNIX )
+	
+	# link against the IBK library
+	target_link_libraries( ${EXAMPLE_FILENAME}
+		BlockMod
+		${QT_LIBRARIES}
+		${APPLE_FRAMEWORKS}
+		${WIN_FRAMEWORKS}
+	)
+endforeach( SRC )
 
-endif( WIN32 )
-
-if( UNIX )
-	add_executable( SerializationTest ${PROJECT_SOURCE_DIR}/../../src/SerializationTest.cpp )
-endif( UNIX )
-
-target_link_libraries( SerializationTest
-	BlockMod
-	${QT_LIBRARIES}
-	${APPLE_FRAMEWORKS}
-	${WIN_FRAMEWORKS}
-)
