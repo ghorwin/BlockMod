@@ -1,0 +1,145 @@
+/*!
+
+\mainpage Overview of the Block Modeling Toolkit
+
+\section intro_sec What is the BlockMod library?
+
+BlockMod is a library for developing block modeling software. Block modeling is
+a way of describing a component simulation model that is broken down into connected
+blocks. Connections are causal, from output to input.
+
+The library handles the underlying data structure to describe the connections
+and provides code for graphical visualization and customization of such
+block models.
+
+\subsection key_features Key Features
+
+The library contains a data model for storing all geometrical information needed to plot 
+and organize a block schematic.
+
+The visualization of the data model is done using QGraphicsView functionality. The library contains
+implementations of different QGraphicsItem classes for the various entities.
+The created diagram can be rendered on screen, and also exported to different graphics formats and printed. The
+library contains graphics item classes for each entity in the data model.
+
+\subsubsection library_levels Library Functionality Levels
+
+- Level 1 - Core level, Serialization/Deserialization of the block network, consisting of all data
+ to recreate the visual representation of the network. This also includes the factory for the graphics items and
+functionality for altering the network in sync with associated graphics items. At this level, only one representation 
+(e.g. screen, with one selected color scheme) is possible.
+
+- Level 2 - Extended level, makes use of additional meta-data stored for various blocks that identify appearance
+by type. This way, the actual graphical representation can be changed without modifying the block data. Needed for
+supporting Themes and screen/print configurations. A print configuration will be just one theme as any other. 
+The functionality for replacing graphics items (e.g. when a block will be a plain rect in one theme, but a bitmap in
+another theme) will be provided by the factory, which can substitute a block if necessary, keeping all the connections.
+
+
+\subsection data_model_functionality Data Model Functionality
+
+The data model stores all information that is needed to reproduce the block diagram, and
+further some meta data for the display (zoom, position, grid spacing, etc.). The data
+model can be serialized into an XML data structure. The data model stores by default only 
+data needed for reconstructing the geometry and the view properties.
+
+The key entities are:
+
+- BLOCKMOD::Block : The major building block of the block diagram
+- BLOCKMOD::Socket : Either input or output socket, belongs to an individual block
+- BLOCKMOD::Connector : A polygon from output to input socket
+- BLOCKMOD::Network : The compound class that holds all data belonging to a network.
+
+That means, the entities BLOCKMOD::Block, BLOCKMOD::Socket and BLOCKMOD::Connector hold all data relevant for
+drawing the respective graphical representation.
+
+There may be different ways to draw a block or a socket or a connector, which require different data. To keep 
+the code simple, the classes hold members for all representations, even though some may not be required for a 
+specific drawing. For example, an SVG graphics is stored as hash code to an embedded data storage (to avoid 
+duplicating large data for many entities with the same representation).
+
+Ideas:
+- generic data storage (key-value pairs), all data mapped to string representations for serialization
+- when reading network, all data is read without checking, no entities are instantiated
+- once network is completed, it is synchronized with graphics items via item factory - bi-directional pointer-related network
+  of instances are instantiated
+- any future change of network is synchronized with graphics view via factory functionality:
+  + entities get removed (connections are lost)
+  + entities get modified (position, rotation, etc.)
+  + entities get added
+  + entities are replaced (connectors are kept)
+
+- all modifications are done through actions
+- all actions have textual representation (for scripting/journaling): 
+e.g.: ADD_BLOCK(id, {...property_list...}, {ID list for all connectors in block} )
+(id must be new and unique)
+CONNECT(output_socket_id, input_socket_id, {...property_list...}, {...connecting polygon...} )
+
+
+
+
+
+\subsection graphics_concent Graphics Concept
+In order to draw an entity of the data model, for each entity a corresponding graphics item exist. 
+
+When syncing the data model to graphical representation, the library must know which graphical representation to
+instantiate. For this a factory pattern is implemented that takes a unique identifier and constructs the corresponding
+class. When adding own classes, the factory must be extended accordingly.
+
+\subsection data_alteration_concept Changes of Data Model and Graphical Representation
+The key idea about keeping the data model and graphical representation in sync is the use of actions that affect
+the data model and are synced to the graphical representation objects.
+
+For each modification an individual command exists (implementated as UndoAction) that call appropriate member functions
+in the data model classes which in turn call the relevant update functionality in the graphical representation objects.
+
+When the user directly modifies a graphics items (by dragging or drag/drop) this triggers an action and results in 
+update of data model before graphics items are then updated again including dependent objects.
+
+For example: if user moves a block, this will call the action that calls Block::setPosition(x,y) 
+which in turn updates geometry of the block, 
+its sockets and also calls the polygon adjustment routine of all connected connectors. The polygon connection routine
+then updates the polygon representation of the connector.
+
+\subsection theming Theme Support
+
+In order to change the appearance of the block schematics, for example to have a white-on-black layout on screen, but 
+black-on-white for printing, the following properties can be mapped:
+- general appearance of construction sketch (background color, line color, text color)
+- drawing of blocks - mapping of graphics files (block may have an image associated, but in a certain theme, this 
+image is replaced by a different image, this mapping is part of the theme)
+
+Theming support is part of the advanced-level functionality.
+
+Implementation:
+- each block/connector/socket has the ability to store meta-data about its type
+- within each theme, the type is mapped to a specific representation. TODO: think about how to handle different 
+  connector locations in different block-themes -> automatic routing possible?
+
+
+
+
+\subsection routing_support Connector Routing
+
+A logic is implemented that allows meaningful routing of connector polygons. A rule set is defined that modifies the 
+polygon when end points/mid points are moved or new points are added.
+
+
+\subsection extending Extending the library
+
+The core functionality of the library is limited to drawing SVG and bitmap images. Also, the appearance of connectors 
+and sockets is fixed.
+
+Creating themes:
+- for each block type an image/SVG must be specified (size?)
+- an image is needed for inlet/outlet sockets, in disconnected and connected state, respectively
+- style information about connector drawing (width, color, pen)
+
+
+Users may want to extend the library because:
+- unforeseen appearance wishes (shadows, outlines, script-based display)
+- 
+
+*/
+
+
