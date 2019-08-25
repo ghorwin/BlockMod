@@ -77,8 +77,10 @@ int main(int argc, char *argv[]) {
 	con.m_name = "Con1";
 	con.m_sourceSocket = "Block1.Right";
 	con.m_targetSocket = "Block2.Inlet";
-	con.m_points.append(QPointF(b1.m_pos + s_right.m_pos));
-	con.m_points.append(QPointF(b2.m_pos + s_left2.m_pos));
+
+	con.m_segments.append( BLOCKMOD::Connector::Segment(Qt::Vertical, 0));
+	con.m_segments.append( BLOCKMOD::Connector::Segment(Qt::Horizontal, 0));
+
 	network.m_connectors.append(con);
 
 	// write network to file

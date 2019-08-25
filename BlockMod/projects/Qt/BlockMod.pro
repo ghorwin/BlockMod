@@ -16,6 +16,7 @@ INCLUDEPATH = \
 RESOURCES += ../../resources/BlockMod.qrc
 
 HEADERS += \
+	../../src/BM_ConnectorSegmentItem.h \
 	../../src/BM_ZoomMeshGraphicsView.h \
 	../../src/BM_Block.h \
 	../../src/BM_Connector.h \
@@ -25,6 +26,7 @@ HEADERS += \
 	../../src/BM_SceneManager.h \
 	../../src/BM_BlockItem.h
 SOURCES += \
+	../../src/BM_ConnectorSegmentItem.cpp \
 	../../src/BM_ZoomMeshGraphicsView.cpp \
 	../../src/BM_Network.cpp \
 	../../src/BM_Block.cpp \

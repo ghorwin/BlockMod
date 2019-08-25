@@ -7,8 +7,6 @@
 #include <BM_Socket.h>
 #include <BM_Connector.h>
 
-#include <BM_BlockItem.h>
-
 class QXmlStreamReader;
 
 namespace BLOCKMOD {

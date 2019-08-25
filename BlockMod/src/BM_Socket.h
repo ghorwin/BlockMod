@@ -18,9 +18,20 @@ namespace BLOCKMOD {
 */
 class Socket {
 public:
-	Socket() {}
+	Socket() :
+		m_pos(0,0),
+		m_orientation(Qt::Horizontal),
+		m_inlet(false)
+	{
+	}
 
-	Socket(const QString & name);
+	Socket(const QString & name) :
+		m_name(name),
+		m_pos(0,0),
+		m_orientation(Qt::Horizontal),
+		m_inlet(false)
+	{
+	}
 
 	/*! Reads content of the block from XML stream. */
 	void readXML(QXmlStreamReader & reader);

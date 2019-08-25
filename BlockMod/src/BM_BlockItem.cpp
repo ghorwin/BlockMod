@@ -9,7 +9,7 @@
 namespace BLOCKMOD {
 
 
-BlockItem::BlockItem(QObject *parent) :
+BlockItem::BlockItem(QObject * /*parent*/) :
 	QGraphicsRectItem(),
 	m_block(nullptr)
 {

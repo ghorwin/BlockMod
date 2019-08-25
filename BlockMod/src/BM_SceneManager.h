@@ -7,21 +7,48 @@ class QGraphicsItem;
 namespace BLOCKMOD {
 
 class Network;
+class Block;
+class BlockItem;
+class Connector;
+class ConnectorSegmentItem;
 
+/*! The graphics scene that visualizes the network. */
 class SceneManager : public QGraphicsScene {
 	Q_OBJECT
 public:
-	explicit SceneManager(QObject *parent = 0);
+	explicit SceneManager(QObject *parent = nullptr);
 
-	void setNetwork(Network & network);
+	/*! D-tor. */
+	virtual ~SceneManager();
 
+	/*! Set a new network (a local copy is made of the network object).
+		This will recreate the entire scene.
+	*/
+	void setNetwork(const Network & network);
+
+	/*! Provide read-only access to the network data structure. */
+	const Network & network() const;
+
+	/*! Give read/write access to a block's custom properties. */
+	Block & block(unsigned int idx);
+
+protected:
+
+	/*! Create a graphics item based on the data in the given block. */
+	virtual BlockItem * createBlockItem(Block & b);
+
+	/*! A single connect yields actually several */
+	virtual QList<ConnectorSegmentItem *> createConnectorItems(Connector & c);
 
 private:
-	/*! The network that we manage. */
-	Network			*m_network;
+	/*! The network that we own and manage. */
+	Network							*m_network;
 
-	/*! The graphics items that we show on the scene. */
-	QList<QGraphicsItem*>	m_items;
+	/*! The block-graphics items that we show on the scene. */
+	QList<BlockItem*>				m_blockItems;
+
+	/*! The connector-graphics items that we show on the scene. */
+	QList<ConnectorSegmentItem*>	m_connectorSegmentItems;
 };
 
 } // namespace BLOCKMOD

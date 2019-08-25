@@ -5,11 +5,11 @@
 #include <QFile>
 #include <QSet>
 #include <QDebug>
-#include <QGraphicsScene>
 
 #include <stdexcept>
 
 #include "BM_Block.h"
+#include "BM_Connector.h"
 #include "BM_XMLHelpers.h"
 
 namespace BLOCKMOD {

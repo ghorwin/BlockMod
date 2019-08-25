@@ -17,8 +17,17 @@ public:
 		Stored is only the offset, should be a multiple of the global grid spacing.
 	*/
 	struct Segment {
+		Segment() :
+			m_direction(Qt::Horizontal),
+			m_offset(0)
+		{}
+		Segment(Qt::Orientation direction, double offset) :
+			m_direction(direction),
+			m_offset(offset)
+		{}
+
 		Qt::Orientation m_direction;
-		double offset;
+		double m_offset;
 	};
 
 	/*! Reads content of the block from XML stream. */
@@ -28,6 +37,8 @@ public:
 	void writeXML(QXmlStreamWriter & writer) const;
 
 
+	/*! Unique identification name of this connector instance. */
+	QString						m_name;
 
 	/*! Holds always at least one horizontal and one vertical segment.
 		A segment of size 0 is ignored when generating the polygon.
