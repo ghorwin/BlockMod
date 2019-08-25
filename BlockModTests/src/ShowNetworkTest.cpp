@@ -25,13 +25,31 @@ int main(int argc, char *argv[]) {
 
 		// This is our widget
 		BLOCKMOD::ZoomMeshGraphicsView * w = new BLOCKMOD::ZoomMeshGraphicsView;
-		w->setGridStep(0.05);
+		w->setResolution(1); // in pix/m
+		w->setGridStep(8); // 8 m = 8 pix
 
 		// Create and load network
 		BLOCKMOD::Network network;
 
 		// read network from file
+#if 0
 		network.readXML("demo2.net");
+#else
+		{
+			BLOCKMOD::Block b;
+			b.m_name = "Block1";
+			b.m_pos = QPointF(0,0);
+			b.m_size = QSize(24,16);
+			network.m_blocks.append(b);
+		}
+		{
+			BLOCKMOD::Block b;
+			b.m_name = "Block2";
+			b.m_pos = QPointF(40,0);
+			b.m_size = QSize(24,16);
+			network.m_blocks.append(b);
+		}
+#endif
 
 		// create scene manager (keeps network data and graphics items in sync)
 		BLOCKMOD::SceneManager * scene = new BLOCKMOD::SceneManager;

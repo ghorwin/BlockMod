@@ -9,16 +9,15 @@
 namespace BLOCKMOD {
 
 Block::Block(const QString & name) :
-	Entity(name),
+	m_name(name),
 	m_pos(0,0)
 {
 }
 
 Block::Block(const QString & name, double x, double y) :
-	Entity(name),
+	m_name(name),
 	m_pos(x,y)
 {
-
 }
 
 void Block::readXML(QXmlStreamReader & reader) {

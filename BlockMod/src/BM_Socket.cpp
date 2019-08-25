@@ -7,13 +7,6 @@
 
 namespace BLOCKMOD {
 
-Socket::Socket(const QString & name) :
-	Entity(name),
-	m_pos(0,0),
-	m_orientation(Qt::Horizontal)
-{
-}
-
 
 void Socket::readXML(QXmlStreamReader & reader) {
 	Q_ASSERT(reader.isStartElement());

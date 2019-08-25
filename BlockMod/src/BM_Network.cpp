@@ -9,6 +9,7 @@
 #include <stdexcept>
 
 #include "BM_Block.h"
+#include "BM_Connector.h"
 #include "BM_XMLHelpers.h"
 
 namespace BLOCKMOD {
@@ -18,13 +19,8 @@ Network::Network()
 }
 
 
-Network::~Network() {
-}
-
-
-
-
 void Network::readXML(const QString & fname) {
+
 	QFile xmlFile(fname);
 	if (!xmlFile.open(QIODevice::ReadOnly | QFile::Text))
 		throw std::runtime_error("Cannot read file.");
@@ -68,11 +64,11 @@ void Network::readXML(const QString & fname) {
 	if (reader.hasError()) {
 		throw std::runtime_error( reader.errorString().toStdString() );
 	}
-
 }
 
 
 void Network::writeXML(const QString & fname) const {
+
 	QFile xmlFile(fname);
 	if (!xmlFile.open(QIODevice::WriteOnly | QFile::Truncate | QFile::Text))
 		throw std::runtime_error("Cannot create output file.");

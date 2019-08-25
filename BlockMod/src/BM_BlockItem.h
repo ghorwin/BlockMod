@@ -1,32 +1,23 @@
 #ifndef BLOCKITEM_H
 #define BLOCKITEM_H
 
-#include <QGraphicsItem>
-
-#include <BM_Block.h>
+#include <QGraphicsRectItem>
 
 namespace BLOCKMOD {
 
-class BlockItem : public QGraphicsItem {
+class Block;
+
+/*! A graphics item that represents a block. */
+class BlockItem : public QGraphicsRectItem {
 public:
-	explicit BlockItem(QObject *parent = 0);
+	explicit BlockItem(QObject *parent = nullptr);
 
-	/*! Creates an internal copy of the Block meta data and customizes
-		the graphics item.
-	*/
-	void setFromBlock(const Block & b);
+//	QRectF boundingRect() const;
 
+//	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-	QRectF boundingRect() const;
-
-	void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
-
-private:
-	Block	m_block; // the block that we draw our data from
-
-	/*! Our own sockets. */
-	QList<QGraphicsItem*>	m_socketItems;
+	/*! Pointer to associated block. */
+	Block	*m_block;
 };
 
 } // namespace BLOCKMOD

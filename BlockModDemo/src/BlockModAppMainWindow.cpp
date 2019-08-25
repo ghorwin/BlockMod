@@ -7,7 +7,7 @@
 BlockModAppMainWindow::BlockModAppMainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::BlockModAppMainWindow),
-	m_scene(NULL)
+	m_scene(nullptr)
 {
 	ui->setupUi(this);
 }
@@ -31,10 +31,10 @@ void BlockModAppMainWindow::on_actionFileQuit_triggered() {
 
 void BlockModAppMainWindow::setNetwork(const BLOCKMOD::Network & network) {
 	// disconnect old representation from network (delete and recreate graphics scene and all items)
-	if (m_scene != NULL) {
+	if (m_scene != nullptr) {
 		QList<QGraphicsItem*> items = m_scene->items();
 		qDeleteAll(items);
-		delete m_scene; m_scene = NULL;
+		delete m_scene; m_scene = nullptr;
 	}
 
 	// create new graphics scene

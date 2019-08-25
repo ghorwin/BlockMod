@@ -3,7 +3,7 @@
 # remember to set DYLD_FALLBACK_LIBRARY_PATH on MacOSX
 # ----------------------------------------------------
 
-TARGET = SerializationTest
+TARGET = ShowNetworkTest
 TEMPLATE = app
 
 # common project configurations, source this file after TEMPLATE was specified
@@ -21,6 +21,6 @@ LIBS += -L../../../lib$${DIR_PREFIX} \
 	-lBlockMod
 
 SOURCES += \
-	../../src/SerializationTest.cpp
+	../../src/ShowNetworkTest.cpp
 
 

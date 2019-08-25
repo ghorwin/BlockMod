@@ -4,21 +4,24 @@
 #include <QLinearGradient>
 #include <QGraphicsPolygonItem>
 
+#include "BM_Block.h"
 
 namespace BLOCKMOD {
 
-BlockItem::BlockItem(QObject *parent) :
-	QGraphicsItem()
+
+BlockItem::BlockItem(QObject * /*parent*/) :
+	QGraphicsRectItem(),
+	m_block(nullptr)
 {
 	setZValue(10);
 }
 
-
+#if 0
 void BlockItem::setFromBlock(const Block & b) {
-	m_block = b;
+	m_block = &b;
 	setPos(b.m_pos);
 
-	qDeleteAll(m_socketItems);
+//	qDeleteAll(m_socketItems);
 
 	for (int i=0; i<b.m_sockets.size(); ++i) {
 		// a socket is drawn by a polygon based on its point, orientation and inlet type
@@ -49,25 +52,17 @@ void BlockItem::setFromBlock(const Block & b) {
 }
 
 
-QRectF BlockItem::boundingRect() const {
-	double penWidth = 1;
-	return QRectF(0 - penWidth / 2, 0 - penWidth / 2,
-				  m_block.m_size.width() + penWidth, m_block.m_size.height() + penWidth);
-}
-
-
 void BlockItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 			QWidget *widget)
 {
-
-	QLinearGradient grad(QPointF(0,0), QPointF(m_block.m_size.width(),0));
+	QLinearGradient grad(QPointF(0,0), QPointF(m_block->m_size.width(),0));
 	grad.setColorAt(0, QColor(196,196,255));
 	grad.setColorAt(1, QColor(255,255,255));
 	painter->setBrush(grad);
-	painter->fillRect(QRectF(0, 0, m_block.m_size.width(), m_block.m_size.height()), grad);
+	painter->fillRect(QRectF(0, 0, m_block->m_size.width(), m_block->m_size.height()), grad);
 	painter->setPen( Qt::black );
-	painter->drawRect(0, 0, m_block.m_size.width(), m_block.m_size.height());
+	painter->drawRect(0, 0, m_block->m_size.width(), m_block->m_size.height());
 }
-
+#endif
 
 } // namespace BLOCKMOD

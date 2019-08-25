@@ -20,27 +20,26 @@ class Network {
 public:
 	/*! Default C'tor. */
 	Network();
-	/*! D'tor, cleanup of allocated resources. */
-	~Network();
 
 	/*! Reads network from file. */
 	void readXML(const QString & fname);
 	/*! Writes network to file. */
 	void writeXML(const QString & fname) const;
-
 	/*! Flattens all ID names of sockets and blocks and checks for duplicates. */
 	void checkNames() const;
 
 	/*! List of all blocks in the network. */
 	QList<Block>		m_blocks;
 
-	/*! List of all connectors in the network. */
+	/*! List of all connectors in the network.
+		Connectors are always associated with sockets (referenced via
+		block-id and socket-id).
+	*/
 	QList<Connector>	m_connectors;
 
 private:
-	void readBlocks(QXmlStreamReader & reader);
-	void readSockets(QXmlStreamReader & reader);
 
+	void readBlocks(QXmlStreamReader & reader);
 };
 
 } // namespace BLOCKMOD
