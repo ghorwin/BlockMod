@@ -5,12 +5,10 @@
 TARGET = BlockMod
 TEMPLATE = lib
 
-# this pri must be sourced from all our libraries,
-# it contains all functions defined for casual libraries
-include( ../../../IBK/projects/Qt/IBK.pri )
+# common project configurations, source this file after TEMPLATE was specified
+include( BlockMod.pri )
 
-QT += core gui network xml
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += core gui network xml widgets
 
 INCLUDEPATH = \
 	../../src

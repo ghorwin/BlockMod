@@ -12,7 +12,7 @@ file( GLOB LIB_HDRS ${PROJECT_SOURCE_DIR}/../../src/*.h )
 file( GLOB LIB_UIS ${PROJECT_SOURCE_DIR}/../../src/*.ui )
 
 # set resource files
-set( LIB_QRCS ${PROJECT_SOURCE_DIR}/../../resources/gfx/BlockMod.qrc )
+set( LIB_QRCS ${PROJECT_SOURCE_DIR}/../../resources/BlockMod.qrc )
 
 get_target_property(QtCore_location Qt5::Core LOCATION)
 get_filename_component(Qt5BinaryDir ${QtCore_location} DIRECTORY)
