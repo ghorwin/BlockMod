@@ -31,6 +31,6 @@ LIBS += -L../../../lib$${DIR_PREFIX} \
 	-lBlockMod
 
 SOURCES += \
-	../../src/serialization_main.cpp
+	../../src/SerializationTest.cpp
 
 
