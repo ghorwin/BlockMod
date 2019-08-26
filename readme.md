@@ -1,5 +1,35 @@
 # BlockMod - a C++/Qt library for modelling of block-based networks and connector routing
 
+## Goal and Vision
+
+Block-based networks are needed for quite a few applications. When developing such an application, where users are allowed to create their own networks, you may need the following functionality:
+
+- drawing of a network of blocks
+- zooming/panning in the view
+- showing sockets on the blocks (optionally with their labels)
+
+User interaction:
+
+- selecting/deselecting blocks
+- connect blocks by dragging lines from socket to socket
+- moving blocks around, hereby keeping the connections and adjusting their geometry automatically
+- defining block geometry and their socket types and positions; when modifying existing blocks keep connections previously made (except when a socket is removed)
+
+Data handling:
+
+- access/retrieve data structure
+- create/manipulate data structure via API
+- serialize/deserialize data structure
+
+Also important:
+- export view of network as vector graphics image/print to printer/PDF
+- adjust style/view options
+
+Customizability:
+
+- override default appearance/drawing of blocks, sockets and connectors
+- create blocks with additional side effects (e.g. mouse hovering shows auxilliary attributes)
+
 ## Basic Concepts
 
 ### Data structure
