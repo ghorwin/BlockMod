@@ -86,19 +86,21 @@ void BlockItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 	QLinearGradient grad(QPointF(0,0), QPointF(rect().width(),0));
 	if (option->state & QStyle::State_Selected) {
 		painter->setPen(QPen(QBrush(QColor(0,128,0)), 1.5));
-		grad.setColorAt(0, QColor(255,255,255));
-		grad.setColorAt(1, QColor(200,255,200));
+		grad.setColorAt(0, QColor(230,255,230));
+		grad.setColorAt(1, QColor(200,240,180));
 	}
 	else {
 		grad.setColorAt(0, QColor(196,196,255));
-		grad.setColorAt(1, QColor(255,255,255));
+		grad.setColorAt(1, QColor(220,220,255));
 	}
 	painter->setBrush(grad);
 	painter->fillRect(rect(), grad);
 	painter->setPen( Qt::black );
 	painter->drawRect(rect());
 	// now draw the label of the block
-	painter->drawText(rect(), Qt::AlignTop | Qt::AlignHCenter, m_block->m_name);
+	QRectF r = rect();
+	r.moveTop(4);
+	painter->drawText(r, Qt::AlignTop | Qt::AlignHCenter, m_block->m_name);
 	painter->restore();
 }
 

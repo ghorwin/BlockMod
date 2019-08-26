@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 		// This is our widget
 		BLOCKMOD::ZoomMeshGraphicsView * w = new BLOCKMOD::ZoomMeshGraphicsView;
 		w->setResolution(1); // in pix/m
-		w->setGridStep(80); // 8 m = 8 pix
+		w->setGridStep(80); // 80 pix/m; 8 pix/m for small grid
 
 		// Create and load network
 		BLOCKMOD::Network network;
@@ -44,12 +44,19 @@ int main(int argc, char *argv[]) {
 			b.m_pos = QPointF(0,0);
 			b.m_size = QSize(30*GX,20*GX);
 
-			// add an outlet socket
+			// add an outlet socket - right
 			BLOCKMOD::Socket s("T_out");
 			s.m_pos = QPointF(b.m_size.width(), 2*GX); // second grid line, right sie
 			s.m_inlet = false;
 			s.m_orientation = Qt::Horizontal;
 			b.m_sockets.append(s);
+
+			// add an outlet socket - left
+			b.m_sockets.append( BLOCKMOD::Socket("T_out2", QPointF(0, 4*GX), Qt::Horizontal, false) );
+			// add an outlet socket - top
+			b.m_sockets.append( BLOCKMOD::Socket("T_out3", QPointF(6*GX, 0), Qt::Vertical, false) );
+			// add an outlet socket - bottom
+			b.m_sockets.append( BLOCKMOD::Socket("T_out4", QPointF(6*GX, b.m_size.height()), Qt::Vertical, false) );
 
 			network.m_blocks.append(b);
 		}
@@ -59,9 +66,21 @@ int main(int argc, char *argv[]) {
 			b.m_pos = QPointF(400,0);
 			b.m_size = QSize(240,160);
 
-			// add an inlet socket
-			BLOCKMOD::Socket s("T_out", QPointF(0, 4*GX), Qt::Horizontal, true);
+			// add an inlet socket - left
+			BLOCKMOD::Socket s("T_in", QPointF(0, 4*GX), Qt::Horizontal, true);
 			b.m_sockets.append(s);
+
+			// add an inlet socket - right
+			BLOCKMOD::Socket s2("T_in2", QPointF(b.m_size.width(), 6*GX), Qt::Horizontal, true);
+			b.m_sockets.append(s2);
+
+			// add an inlet socket - top
+			BLOCKMOD::Socket s3("T_in3", QPointF(4*GX, 0), Qt::Vertical, true);
+			b.m_sockets.append(s3);
+
+			// add an inlet socket - bottom
+			BLOCKMOD::Socket s4("T_in4", QPointF(4*GX, b.m_size.height()), Qt::Vertical, true);
+			b.m_sockets.append(s4);
 
 			network.m_blocks.append(b);
 		}
@@ -70,6 +89,7 @@ int main(int argc, char *argv[]) {
 		// create scene manager (keeps network data and graphics items in sync)
 		BLOCKMOD::SceneManager * scene = new BLOCKMOD::SceneManager;
 		scene->setNetwork(network); // network is now known and managed by scene manager
+		scene->setSceneRect(QRectF(-80,-80,800,800));
 		w->setScene(scene);
 
 		// currently, the network can be viewed, zoomed in/out and panned, and blocks can be moved

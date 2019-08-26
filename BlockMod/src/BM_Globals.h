@@ -6,6 +6,8 @@ namespace BLOCKMOD {
 class Globals {
 public:
 	static double GridSpacing;
+
+	static double LabelFontSize;
 };
 
 } // namespace BLOCKMOD
