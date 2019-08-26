@@ -61,10 +61,9 @@ Block & SceneManager::block(unsigned int idx) {
 // ** protected functions **
 
 BlockItem * SceneManager::createBlockItem(Block & b) {
-	BlockItem * item = new BlockItem;
+	BlockItem * item = new BlockItem(&b);
 	item->setRect(0,0,b.m_size.width(), b.m_size.height());
 	item->setPos(b.m_pos);
-	item->m_block = &b; // store back-reference to data set
 	return item;
 }
 

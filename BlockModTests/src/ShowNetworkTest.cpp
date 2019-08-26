@@ -39,14 +39,14 @@ int main(int argc, char *argv[]) {
 			BLOCKMOD::Block b;
 			b.m_name = "Block1";
 			b.m_pos = QPointF(0,0);
-			b.m_size = QSize(24,16);
+			b.m_size = QSize(240,160);
 			network.m_blocks.append(b);
 		}
 		{
 			BLOCKMOD::Block b;
 			b.m_name = "Block2";
-			b.m_pos = QPointF(40,0);
-			b.m_size = QSize(24,16);
+			b.m_pos = QPointF(400,0);
+			b.m_size = QSize(240,160);
 			network.m_blocks.append(b);
 		}
 #endif

@@ -2,6 +2,6 @@
 
 namespace BLOCKMOD {
 
-double Globals::GridSpacing = 10; // in pixel
+double Globals::GridSpacing = 8; // in pixel
 
 } // namespace BLOCKMOD
