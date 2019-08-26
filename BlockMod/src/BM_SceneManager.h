@@ -44,7 +44,7 @@ protected:
 		You can override this method and create your own graphics items, derived from
 		base class ConnectorSegmentItem (which contains all the move/selection logic).
 	*/
-	virtual QList<ConnectorSegmentItem *> createConnectorItems(Connector & c);
+	virtual QList<ConnectorSegmentItem *> createConnectorItems(Connector & con);
 
 private:
 	/*! The network that we own and manage. */

@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 		{
 			BLOCKMOD::Block b;
 			b.m_name = "Block2";
-			b.m_pos = QPointF(400,0);
+			b.m_pos = QPointF(400,240);
 			b.m_size = QSize(240,160);
 
 			// add an inlet socket - left
@@ -90,13 +90,13 @@ int main(int argc, char *argv[]) {
 		BLOCKMOD::Connector con;
 		con.m_name = "Con1";
 		con.m_sourceSocket = "Block1.T_out";
-		con.m_targetSocket = "Block2.T_in";
+		con.m_targetSocket = "Block2.T_in3";
 		con.m_segments.append( BLOCKMOD::Connector::Segment(Qt::Horizontal, 0));
 		con.m_segments.append( BLOCKMOD::Connector::Segment(Qt::Vertical, 0));
 		network.m_connectors.append(con);
 
 		con.m_name = "Con2";
-		con.m_sourceSocket = "Block1.T_out2";
+		con.m_sourceSocket = "Block1.T_out4";
 		con.m_targetSocket = "Block2.T_in2";
 		con.m_segments.clear();
 		network.m_connectors.append(con);

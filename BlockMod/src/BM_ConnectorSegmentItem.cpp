@@ -2,7 +2,10 @@
 
 namespace BLOCKMOD {
 
-ConnectorSegmentItem::ConnectorSegmentItem() {
+ConnectorSegmentItem::ConnectorSegmentItem(Connector * connector) :
+	m_connector(connector),
+	m_segmentIdx(-1)
+{
 
 }
 
