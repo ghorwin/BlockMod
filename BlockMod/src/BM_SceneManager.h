@@ -34,10 +34,16 @@ public:
 
 protected:
 
-	/*! Create a graphics item based on the data in the given block. */
+	/*! Create a graphics item based on the data in the given block.
+		You can override this method and create your own graphics items, derived from
+		base class BlockItem (which contains all the move/selection logic).
+	*/
 	virtual BlockItem * createBlockItem(Block & b);
 
-	/*! A single connect yields actually several */
+	/*! A single connect yields actually several line segments, which are created here.
+		You can override this method and create your own graphics items, derived from
+		base class ConnectorSegmentItem (which contains all the move/selection logic).
+	*/
 	virtual QList<ConnectorSegmentItem *> createConnectorItems(Connector & c);
 
 private:

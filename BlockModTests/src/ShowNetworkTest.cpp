@@ -10,6 +10,7 @@
 #include <BM_Network.h>
 #include <BM_ZoomMeshGraphicsView.h>
 #include <BM_SceneManager.h>
+#include <BM_Globals.h>
 
 int main(int argc, char *argv[]) {
 	QApplication a(argc, argv);
@@ -26,10 +27,12 @@ int main(int argc, char *argv[]) {
 		// This is our widget
 		BLOCKMOD::ZoomMeshGraphicsView * w = new BLOCKMOD::ZoomMeshGraphicsView;
 		w->setResolution(1); // in pix/m
-		w->setGridStep(8); // 8 m = 8 pix
+		w->setGridStep(80); // 8 m = 8 pix
 
 		// Create and load network
 		BLOCKMOD::Network network;
+
+		const int GX = (const int)BLOCKMOD::Globals::GridSpacing;
 
 		// read network from file
 #if 0
@@ -39,7 +42,15 @@ int main(int argc, char *argv[]) {
 			BLOCKMOD::Block b;
 			b.m_name = "Block1";
 			b.m_pos = QPointF(0,0);
-			b.m_size = QSize(240,160);
+			b.m_size = QSize(30*GX,20*GX);
+
+			// add an outlet socket
+			BLOCKMOD::Socket s("T_out");
+			s.m_pos = QPointF(b.m_size.width(), 2*GX); // second grid line, right sie
+			s.m_inlet = false;
+			s.m_orientation = Qt::Horizontal;
+			b.m_sockets.append(s);
+
 			network.m_blocks.append(b);
 		}
 		{
@@ -47,6 +58,11 @@ int main(int argc, char *argv[]) {
 			b.m_name = "Block2";
 			b.m_pos = QPointF(400,0);
 			b.m_size = QSize(240,160);
+
+			// add an inlet socket
+			BLOCKMOD::Socket s("T_out", QPointF(0, 4*GX), Qt::Horizontal, true);
+			b.m_sockets.append(s);
+
 			network.m_blocks.append(b);
 		}
 #endif
@@ -56,7 +72,7 @@ int main(int argc, char *argv[]) {
 		scene->setNetwork(network); // network is now known and managed by scene manager
 		w->setScene(scene);
 
-		// currently, the network can be viewed, zoomed in/out and panned, nothing else
+		// currently, the network can be viewed, zoomed in/out and panned, and blocks can be moved
 
 #if defined(Q_OS_WIN)
 		w->showMaximized();

@@ -12,6 +12,7 @@ namespace BLOCKMOD {
 SceneManager::SceneManager(QObject *parent) :
 	QGraphicsScene(parent), m_network(new Network)
 {
+	// set render hints
 }
 
 

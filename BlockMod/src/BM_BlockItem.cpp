@@ -10,9 +10,9 @@
 
 #include "BM_Block.h"
 #include "BM_Globals.h"
+#include "BM_SocketItem.h"
 
 namespace BLOCKMOD {
-
 
 BlockItem::BlockItem(Block * b) :
 	QGraphicsRectItem(),
@@ -20,6 +20,8 @@ BlockItem::BlockItem(Block * b) :
 {
 	setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
 	setZValue(10);
+
+	createSocketItems();
 }
 
 #if 0
@@ -62,9 +64,25 @@ void BlockItem::setFromBlock(const Block & b) {
 
 // *** protected functions ***
 
+/*! This function is called from the constructor and creates child socket items. */
+void BlockItem::createSocketItems() {
+	Q_ASSERT(m_socketItems.isEmpty());
+
+	// the socket items are children of the block item and are added/removed together with the
+	// parent block item
+	for (Socket & s : m_block->m_sockets) {
+		// create a socket item
+		SocketItem * item = new SocketItem(this, &s);
+		m_socketItems.append(item);
+	}
+
+}
+
 void BlockItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 			QWidget */*widget*/)
 {
+	painter->save();
+	painter->setRenderHint(QPainter::Antialiasing, true);
 	QLinearGradient grad(QPointF(0,0), QPointF(rect().width(),0));
 	if (option->state & QStyle::State_Selected) {
 		painter->setPen(QPen(QBrush(QColor(0,128,0)), 1.5));
@@ -81,6 +99,7 @@ void BlockItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 	painter->drawRect(rect());
 	// now draw the label of the block
 	painter->drawText(rect(), Qt::AlignTop | Qt::AlignHCenter, m_block->m_name);
+	painter->restore();
 }
 
 

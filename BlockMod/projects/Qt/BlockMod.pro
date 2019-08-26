@@ -18,6 +18,7 @@ RESOURCES += ../../resources/BlockMod.qrc
 HEADERS += \
 	../../src/BM_ConnectorSegmentItem.h \
 	../../src/BM_Globals.h \
+	../../src/BM_SocketItem.h \
 	../../src/BM_ZoomMeshGraphicsView.h \
 	../../src/BM_Block.h \
 	../../src/BM_Connector.h \
@@ -29,6 +30,7 @@ HEADERS += \
 SOURCES += \
 	../../src/BM_ConnectorSegmentItem.cpp \
 	../../src/BM_Globals.cpp \
+	../../src/BM_SocketItem.cpp \
 	../../src/BM_ZoomMeshGraphicsView.cpp \
 	../../src/BM_Network.cpp \
 	../../src/BM_Block.cpp \

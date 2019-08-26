@@ -18,6 +18,7 @@ namespace BLOCKMOD {
 */
 class Socket {
 public:
+	/*! Default C'tor. */
 	Socket() :
 		m_pos(0,0),
 		m_orientation(Qt::Horizontal),
@@ -25,11 +26,21 @@ public:
 	{
 	}
 
+	/*! C'tor, creating named default socket. */
 	Socket(const QString & name) :
 		m_name(name),
 		m_pos(0,0),
 		m_orientation(Qt::Horizontal),
 		m_inlet(false)
+	{
+	}
+
+	/*! C'tor, initializes all members. */
+	Socket(const QString & name, const QPointF & pos, Qt::Orientation orientation, bool inlet) :
+		m_name(name),
+		m_pos(pos),
+		m_orientation(orientation),
+		m_inlet(inlet)
 	{
 	}
 
