@@ -7,6 +7,7 @@
 #include <QDebug>
 
 #include <stdexcept>
+#include <iostream>
 
 #include "BM_Block.h"
 #include "BM_Connector.h"
@@ -134,5 +135,74 @@ void Network::checkNames() const {
 		}
 	}
 }
+
+
+void Network::adjustConnectors() {
+	for (Connector & c : m_connectors) {
+		try {
+			adjustConnector(c);
+		}
+		catch (std::runtime_error & e) {
+			std::cerr << "Error adjusting connector " << c.m_name.toStdString() << std::endl;
+			throw e;
+		}
+	}
+}
+
+
+void Network::adjustConnector(Connector & con) {
+	// split at first . and extract block name
+//	QString sourceBlock, sourceSocket;
+//	QString targetBlock, targetSocket;
+//	splitFlatName(con.m_sourceSocket, sourceBlock, sourceSocket);
+//	splitFlatName(con.m_targetSocket, targetBlock, targetSocket);
+	// retrieve block data structures
+//	const Block & sourceBlock = blockByName(sourceBlock);
+//	const Block & targetBlock = blockByName(sourceBlock);
+	const Socket * socket;
+	const Block * block;
+	lookupBlockAndSocket(con.m_sourceSocket, block, socket);
+	// get start coordinates: first point is the socket's center, second point is the connection point outside the socket
+	QLineF startLine = block->socketStartLine(socket);
+	lookupBlockAndSocket(con.m_targetSocket, block, socket);
+	// get start coordinates: first point is the socket's center, second point is the connection point outside the socket
+	QLineF endLine = block->socketStartLine(socket);
+
+	// compute dx and dy between connection points
+
+}
+
+
+void Network::lookupBlockAndSocket(const QString & flatName, const Block *& block, const Socket * &socket) const {
+	QString blockName, socketName;
+	splitFlatName(flatName, blockName, socketName);
+	// search block by name
+	auto blockIt = std::find_if(m_blocks.constBegin(), m_blocks.constEnd(),
+								[&] (const Block& b) { return b.m_name == blockName; } );
+	if (blockIt == m_blocks.constEnd())
+		throw std::runtime_error("Invalid flat name.");
+
+	const Block & b = *blockIt;
+	block = &b;
+
+	// search socket by name
+	auto socketIt = std::find_if(b.m_sockets.constBegin(), b.m_sockets.constEnd(),
+								[&] (const Socket& s) { return s.m_name == socketName; } );
+	if (socketIt == b.m_sockets.constEnd())
+		throw std::runtime_error("Invalid flat name.");
+
+	const Socket & s = *socketIt;
+	socket = &s;
+}
+
+
+void Network::splitFlatName(const QString & flatVariableName, QString & blockName, QString & socketName) {
+	int pos = flatVariableName.indexOf('.');
+	if (pos == -1)
+		throw std::runtime_error("Bad flat name, missing . character");
+	blockName = flatVariableName.left(pos).trimmed();
+	socketName = flatVariableName.right(flatVariableName.length() - pos - 1).trimmed();
+}
+
 
 } // namespace BLOCKMOD

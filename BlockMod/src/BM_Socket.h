@@ -50,6 +50,25 @@ public:
 	/*! Dumps out content of block to stream writer. */
 	void writeXML(QXmlStreamWriter & writer) const;
 
+	/*! Socket direction indicates into which direction a socket is pointing. */
+	enum SocketDirection {
+		Left,
+		Right,
+		Top,
+		Bottom
+	};
+
+	/*! Determine direction of socket based on position and orientation properties. */
+	SocketDirection direction() const {
+		if (m_orientation == Qt::Horizontal) {
+			if (m_pos.x() == 0.0)	return Left;
+			else					return Right;
+		} else {
+			if (m_pos.y() == 0.0)	return Top;
+			else					return Bottom;
+		}
+	}
+
 	QString			m_name;
 
 	/*! Position (connection point) of Socket.

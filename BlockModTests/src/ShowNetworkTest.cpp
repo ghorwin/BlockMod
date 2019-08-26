@@ -84,6 +84,18 @@ int main(int argc, char *argv[]) {
 
 			network.m_blocks.append(b);
 		}
+
+		// now create connectors between the various blocks and sockets
+
+		BLOCKMOD::Connector con;
+		con.m_name = "Con1";
+		con.m_sourceSocket = "Block1.T_out";
+		con.m_targetSocket = "Block2.T_in";
+		con.m_segments.append( BLOCKMOD::Connector::Segment(Qt::Horizontal, 0));
+		con.m_segments.append( BLOCKMOD::Connector::Segment(Qt::Vertical, 0));
+		network.m_connectors.append(con);
+
+		network.adjustConnectors();
 #endif
 
 		// create scene manager (keeps network data and graphics items in sync)

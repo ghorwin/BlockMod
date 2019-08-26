@@ -28,6 +28,17 @@ public:
 	/*! Flattens all ID names of sockets and blocks and checks for duplicates. */
 	void checkNames() const;
 
+	/*! Processes all connectors and updates their segments so that start/end sockets are connected. */
+	void adjustConnectors();
+
+	/*! Processes a single connector and adjusts the connection segments.
+		Function first checks if blocks and sockets match using <block-name>.<socket-name> referencing.
+	*/
+	void adjustConnector(Connector & con);
+
+	/*! Searches block and socket data structure by flat variable name. */
+	void lookupBlockAndSocket(const QString & flatName, const Block * &block, const Socket * &socket) const;
+
 	/*! List of all blocks in the network. */
 	QList<Block>		m_blocks;
 
@@ -36,6 +47,11 @@ public:
 		block-id and socket-id).
 	*/
 	QList<Connector>	m_connectors;
+
+	/*! Takes a flat name of format <block-name>.<socket-name> and extracts both parts.
+		Throws an exception if . is missing or either name is an empty string.
+	*/
+	static void splitFlatName(const QString & flatVariableName, QString & blockName, QString & socketName);
 
 private:
 

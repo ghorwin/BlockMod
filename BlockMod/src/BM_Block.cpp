@@ -75,6 +75,14 @@ void Block::writeXML(QXmlStreamWriter & writer) const {
 }
 
 
+QLineF Block::socketStartLine(const Socket * socket) const {
+	// first determine the direction: top, left, right, bottom
+
+
+
+}
+
+
 } // namespace BLOCKMOD
 
 

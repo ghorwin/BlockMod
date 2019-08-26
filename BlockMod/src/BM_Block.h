@@ -5,6 +5,7 @@
 #include <QString>
 #include <QPointF>
 #include <QSizeF>
+#include <QLineF>
 #include <QMap>
 
 #include <QXmlStreamReader>
@@ -32,6 +33,9 @@ public:
 
 	/*! Dumps out content of block to stream writer. */
 	void writeXML(QXmlStreamWriter & writer) const;
+
+	/*! Generate connection line between socket and point, where first connector segment starts. */
+	QLineF socketStartLine(const Socket * socket) const;
 
 	/*! Unique identification name of this block instance. */
 	QString						m_name;
