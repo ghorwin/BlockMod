@@ -169,7 +169,43 @@ void Network::adjustConnector(Connector & con) {
 	QLineF endLine = block->socketStartLine(socket);
 
 	// compute dx and dy between connection points
+	double dx = endLine.p2().x() - startLine.p2().x();
+	double dy = endLine.p2().y() - startLine.p2().y();
 
+	if (dx != 0.0) {
+		// now search for first connector segment that is horizontal
+		int i;
+		for (i=0;i<con.m_segments.count(); ++i) {
+			if (con.m_segments[i].m_direction == Qt::Horizontal) {
+				con.m_segments[i].m_offset += dx;
+				break;
+			}
+		}
+		if (i == con.m_segments.count()) {
+			// add a new segment with proper size
+			Connector::Segment s;
+			s.m_direction = Qt::Horizontal;
+			s.m_offset = dx;
+			con.m_segments.append(s);
+		}
+	}
+	if (dy != 0.0) {
+		// now search for first connector segment that is vertical
+		int i;
+		for (i=0;i<con.m_segments.count(); ++i) {
+			if (con.m_segments[i].m_direction == Qt::Vertical) {
+				con.m_segments[i].m_offset += dy;
+				break;
+			}
+		}
+		if (i == con.m_segments.count()) {
+			// add a new segment with proper size
+			Connector::Segment s;
+			s.m_direction = Qt::Vertical;
+			s.m_offset = dy;
+			con.m_segments.append(s);
+		}
+	}
 }
 
 

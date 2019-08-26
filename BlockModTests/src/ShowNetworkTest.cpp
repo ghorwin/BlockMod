@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 
 			// add an outlet socket - right
 			BLOCKMOD::Socket s("T_out");
-			s.m_pos = QPointF(b.m_size.width(), 2*GX); // second grid line, right sie
+			s.m_pos = QPointF(b.m_size.width(), 2*GX); // second grid line, right side
 			s.m_inlet = false;
 			s.m_orientation = Qt::Horizontal;
 			b.m_sockets.append(s);
@@ -93,6 +93,12 @@ int main(int argc, char *argv[]) {
 		con.m_targetSocket = "Block2.T_in";
 		con.m_segments.append( BLOCKMOD::Connector::Segment(Qt::Horizontal, 0));
 		con.m_segments.append( BLOCKMOD::Connector::Segment(Qt::Vertical, 0));
+		network.m_connectors.append(con);
+
+		con.m_name = "Con2";
+		con.m_sourceSocket = "Block1.T_out2";
+		con.m_targetSocket = "Block2.T_in2";
+		con.m_segments.clear();
 		network.m_connectors.append(con);
 
 		network.adjustConnectors();

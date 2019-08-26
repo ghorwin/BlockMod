@@ -34,7 +34,9 @@ public:
 	/*! Dumps out content of block to stream writer. */
 	void writeXML(QXmlStreamWriter & writer) const;
 
-	/*! Generate connection line between socket and point, where first connector segment starts. */
+	/*! Generate connection line between socket and point, where first connector segment starts.
+		Returned coordinates are in scene-coordinates.
+	*/
 	QLineF socketStartLine(const Socket * socket) const;
 
 	/*! Unique identification name of this block instance. */

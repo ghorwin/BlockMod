@@ -5,6 +5,7 @@
 #include <QDebug>
 
 #include "BM_XMLHelpers.h"
+#include "BM_Globals.h"
 
 namespace BLOCKMOD {
 
@@ -77,9 +78,18 @@ void Block::writeXML(QXmlStreamWriter & writer) const {
 
 QLineF Block::socketStartLine(const Socket * socket) const {
 	// first determine the direction: top, left, right, bottom
-
-
-
+	QPointF otherPoint = socket->m_pos;
+	switch (socket->direction()) {
+		case Socket::Left	: otherPoint += QPointF(-2*Globals::GridSpacing, 0); break;
+		case Socket::Right	: otherPoint += QPointF(+2*Globals::GridSpacing, 0); break;
+		case Socket::Top	: otherPoint += QPointF(0, -2*Globals::GridSpacing); break;
+		case Socket::Bottom	: otherPoint += QPointF(0, +2*Globals::GridSpacing); break;
+	}
+	QPointF startPoint(socket->m_pos);
+	// shift both points by block position
+	startPoint += m_pos;
+	otherPoint += m_pos;
+	return QLineF(startPoint, otherPoint);
 }
 
 
