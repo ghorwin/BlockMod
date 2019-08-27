@@ -195,13 +195,13 @@ QVariant ConnectorSegmentItem::itemChange(GraphicsItemChange change, const QVari
 
 			// inform network to update connectors
 
-			setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+//			setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
 			// Note: when the sceneManager calls setLine() in this line segment, it already gives new scene coordinates.
 			//       However, at the end of the function, also the position of line is modified. Thus, the line is moved twice the distance.
 			SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
 			if (sceneManager != nullptr)
-				sceneManager->connectorMoved(m_connector);
-			setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
+				sceneManager->connectorSegmentMoved(this);
+//			setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
 //			qDebug() << "Move: " << moveDist;
 //			qDebug() << "Before : " << oldLine;
 //			qDebug() << "After scene manager: " << line();

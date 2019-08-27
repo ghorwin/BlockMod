@@ -38,8 +38,13 @@ public:
 
 	/*! Called from ConnectorSegmentItem when a segment was moved to signal the scene manager
 		to adjust the connected connectors.
+		\param currentItem Pointer to the item currently being moved. It's socket index is
+			expected to be already correctly set including possible inserted new segments.
+
+		This function creates new segment items as needed and removes no longer needed segments
+		(after a segment merge, for example).
 	*/
-	void connectorMoved(const Connector * con);
+	void connectorSegmentMoved(ConnectorSegmentItem * currentItem);
 
 protected:
 
@@ -59,8 +64,12 @@ private:
 	/*! Looks up all segment items belonging to this connector and updates
 		their coordinates.
 		Adds/removes segment items as necessary and updates m_connectorSegmentItems accordingly.
+
+		\param con Connector to sync with connector items
+		\param currentItem Pointer to currently moved item. May be a nullptr, in which case the
+			first segment is treated as current item.
 	*/
-	void updateConnectorSegmentItems(const Connector & con);
+	void updateConnectorSegmentItems(const Connector & con, ConnectorSegmentItem * currentItem);
 
 
 	/*! The network that we own and manage. */

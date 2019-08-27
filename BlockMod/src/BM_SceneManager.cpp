@@ -67,14 +67,14 @@ void SceneManager::blockMoved(const Block * block) {
 	for (Connector * con : cons) {
 		m_network->adjustConnector(*con);
 		// update corresponding connectorItems (maybe remove/add items)
-		updateConnectorSegmentItems(*con);
+		updateConnectorSegmentItems(*con, nullptr);
 	}
 }
 
 
-void SceneManager::connectorMoved(const Connector * con) {
+void SceneManager::connectorSegmentMoved(ConnectorSegmentItem * currentItem) {
 	// update corresponding connectorItems (maybe remove/add items)
-	updateConnectorSegmentItems(*con);
+	updateConnectorSegmentItems(*currentItem->m_connector, currentItem);
 }
 
 
@@ -143,7 +143,7 @@ QList<ConnectorSegmentItem *> SceneManager::createConnectorItems(Connector & con
 }
 
 
-void SceneManager::updateConnectorSegmentItems(const Connector & con) {
+void SceneManager::updateConnectorSegmentItems(const Connector & con, ConnectorSegmentItem * currentItem) {
 	// lookup corresponding connectorItems
 	ConnectorSegmentItem*	startSegment = nullptr;
 	ConnectorSegmentItem*	endSegment = nullptr;
@@ -155,24 +155,47 @@ void SceneManager::updateConnectorSegmentItems(const Connector & con) {
 			else if (segmentItem->m_segmentIdx == -2)
 				endSegment = segmentItem;
 			else {
-				segmentItems.append(segmentItem);
+				if (currentItem == nullptr || segmentItem != currentItem)
+					segmentItems.append(segmentItem);
 			}
 		}
 	}
 	// sanity checks
 	Q_ASSERT(startSegment != nullptr);
 	Q_ASSERT(endSegment != nullptr);
+	// segmentItems now contains all segment items matching this connected, except the currentItem
+	int itemsNeeded = con.m_segments.count();
+	if (currentItem != nullptr)
+		--itemsNeeded;
 
 	// remove any superfluous segment items
-	while (segmentItems.count() > con.m_segments.count()) {
+	while (segmentItems.count() > itemsNeeded) {
 		ConnectorSegmentItem* segmentItem = segmentItems.back();
 		m_connectorSegmentItems.removeOne(segmentItem);
 		delete segmentItem;
 		segmentItems.pop_back();
 	}
 
+	// add missing items
+	for (int i=segmentItems.count(); i<itemsNeeded; ++i) {
+		ConnectorSegmentItem * item = new ConnectorSegmentItem(const_cast<Connector*>(&con)); // need to get write access for connector in newly created item
+		qDebug() << "Adding item";
+		addItem(item);
+		m_connectorSegmentItems.append(item);
+		segmentItems.append(item);
+	}
+
+	// insert current item at correct index position
+	if (currentItem != nullptr) {
+		Q_ASSERT(currentItem->m_segmentIdx < segmentItems.count());
+		segmentItems.insert(currentItem->m_segmentIdx, currentItem);
+	}
+
+	Q_ASSERT(segmentItems.count() == con.m_segments.count());
+
 	// now process all segment items
 	try {
+		// first start and end segments
 		const Socket * socket;
 		const Block * block;
 		m_network->lookupBlockAndSocket(con.m_sourceSocket, block, socket);
@@ -188,30 +211,14 @@ void SceneManager::updateConnectorSegmentItems(const Connector & con) {
 		endLine.translate(-pos);
 		endSegment->setLine(endLine);
 
+		// now all others
 		QPointF start = startLine.p2();
 		qDebug() << "Updating " << con.m_segments.count() << " segments";
 		for (int i=0; i<con.m_segments.count(); ++i) {
 			const Connector::Segment & seg = con.m_segments[i];
 			// create new segment items if new ones have been added in the meantime
-			ConnectorSegmentItem* item;
-			if (i>= segmentItems.count()) {
-				item = new ConnectorSegmentItem(const_cast<Connector*>(&con)); // need to get write access for connector in newly created item
-				qDebug() << "Adding item";
-				addItem(item);
-				m_connectorSegmentItems.append(item);
-				segmentItems.insert(i,item);
-			}
-			else {
-				item = segmentItems[i];
-				Q_ASSERT(item != nullptr);
-//				if (item == nullptr) {
-//					qDebug() << "Adding item";
-//					item = new ConnectorSegmentItem(const_cast<Connector*>(&con)); // need to get write access for connector in newly created item
-//					addItem(item);
-//					m_connectorSegmentItems.append(item);
-//					segmentItems[i] = item;
-//				}
-			}
+			ConnectorSegmentItem* item = segmentItems[i];
+			Q_ASSERT(item != nullptr);
 			QPointF next(start);
 			if (seg.m_direction == Qt::Horizontal)
 				next += QPointF(seg.m_offset, 0);
@@ -228,8 +235,8 @@ void SceneManager::updateConnectorSegmentItems(const Connector & con) {
 	} catch (...) {
 		// error handling
 	}
-	for (auto item : m_connectorSegmentItems)
-		qDebug() << item << " : " << item->m_connector << " : " << item->m_segmentIdx << " : " << item->line();
+//	for (auto item : m_connectorSegmentItems)
+//		qDebug() << item << " : " << item->m_connector << " : " << item->m_segmentIdx << " : " << item->line();
 }
 
 } // namespace BLOCKMOD
