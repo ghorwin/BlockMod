@@ -2,6 +2,7 @@
 
 #include <QGraphicsItem>
 #include <QGraphicsPolygonItem>
+#include <QDebug>
 
 #include <iostream>
 
@@ -162,11 +163,11 @@ void SceneManager::updateConnectorSegmentItems(const Connector & con) {
 	// sanity checks
 	Q_ASSERT(startSegment != nullptr);
 	Q_ASSERT(endSegment != nullptr);
-	Q_ASSERT(std::count(segmentItems.begin(), segmentItems.end(), nullptr) == 0);
 
 	// remove any superfluous segment items
 	while (segmentItems.count() > con.m_segments.count()) {
 		ConnectorSegmentItem* segmentItem = segmentItems.back();
+		m_connectorSegmentItems.removeOne(segmentItem);
 		delete segmentItem;
 		segmentItems.pop_back();
 	}
@@ -178,24 +179,49 @@ void SceneManager::updateConnectorSegmentItems(const Connector & con) {
 		m_network->lookupBlockAndSocket(con.m_sourceSocket, block, socket);
 		// get start line coordinates: first point is the socket's center, second point is the connection point outside the socket
 		QLineF startLine = block->socketStartLine(socket);
+		QPointF pos = startSegment->pos();
+		startLine.translate(-pos);
 		startSegment->setLine(startLine);
 		// get end line coordinates: first point is the socket's center, second point is the connection point outside the socket
 		m_network->lookupBlockAndSocket(con.m_targetSocket, block, socket);
 		QLineF endLine = block->socketStartLine(socket);
+		pos = endSegment->pos();
+		endLine.translate(-pos);
 		endSegment->setLine(endLine);
 
 		QPointF start = startLine.p2();
+		qDebug() << "Updating " << con.m_segments.count() << " segments";
 		for (int i=0; i<con.m_segments.count(); ++i) {
 			const Connector::Segment & seg = con.m_segments[i];
-			ConnectorSegmentItem* item = segmentItems[i];
+			// create new segment items if new ones have been added in the meantime
+			ConnectorSegmentItem* item;
+			if (i>= segmentItems.count()) {
+				item = new ConnectorSegmentItem(const_cast<Connector*>(&con)); // need to get write access for connector in newly created item
+				qDebug() << "Adding item";
+				addItem(item);
+				m_connectorSegmentItems.append(item);
+			}
+			else {
+				item = segmentItems[i];
+				if (item == nullptr) {
+					qDebug() << "Adding item";
+					item = new ConnectorSegmentItem(const_cast<Connector*>(&con)); // need to get write access for connector in newly created item
+					addItem(item);
+					m_connectorSegmentItems.append(item);
+				}
+			}
 			QPointF next(start);
 			if (seg.m_direction == Qt::Horizontal)
 				next += QPointF(seg.m_offset, 0);
 			else
 				next += QPointF(0, seg.m_offset);
-			item->setLine(QLineF(start, next));
+			QLineF newLine(start, next);
+			pos = item->pos();
+			newLine.translate(-pos);
+			item->setLine(newLine);
 			item->m_segmentIdx = i; // regular line segment
 			start = next;
+			qDebug() << "[" << i << "] " << newLine;
 		}
 	} catch (...) {
 		// error handling

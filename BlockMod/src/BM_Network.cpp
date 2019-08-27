@@ -183,7 +183,7 @@ void Network::adjustConnector(Connector & con) {
 	}
 
 	// remaining distance must be distributed to segments
-	if (std::fabs(dx/Globals::GridSpacing) < 1e-6) {
+	if (!Globals::nearZero(dx)) {
 		// now search for first connector segment that is horizontal
 		int i;
 		for (i=0;i<con.m_segments.count(); ++i) {
@@ -200,7 +200,7 @@ void Network::adjustConnector(Connector & con) {
 			con.m_segments.append(s);
 		}
 	}
-	if (std::fabs(dy/Globals::GridSpacing) < 1e-6) {
+	if (!Globals::nearZero(dy)) {
 		// now search for first connector segment that is vertical
 		int i;
 		for (i=0;i<con.m_segments.count(); ++i) {

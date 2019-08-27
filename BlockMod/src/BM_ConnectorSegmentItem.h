@@ -40,7 +40,9 @@ private:
 	/*! Indicates, that the item has been moved. */
 	bool		m_moved;
 
-	/*! Caches current p1() position of the line to detect snapped grid movement. */
+	/*! Caches current position of the line to detect snapped grid movement.
+		\note Position of the line is not the same as p1 and p2, which are changed with setLine().
+	*/
 	QPoint		m_lastPos;
 };
 
