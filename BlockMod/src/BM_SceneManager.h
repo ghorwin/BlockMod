@@ -2,6 +2,8 @@
 #define BM_SceneManagerH
 
 #include <QGraphicsScene>
+#include <QMap>
+
 class QGraphicsItem;
 
 namespace BLOCKMOD {
@@ -29,8 +31,10 @@ public:
 	/*! Provide read-only access to the network data structure. */
 	const Network & network() const;
 
-	/*! Give read/write access to a block's custom properties. */
-	Block & block(unsigned int idx);
+	/*! Called from BlockItem when a block was moved to signal the scene manager
+		to adjust the connected connectors.
+	*/
+	void blockMoved(const Block * block);
 
 protected:
 
@@ -47,6 +51,13 @@ protected:
 	virtual QList<ConnectorSegmentItem *> createConnectorItems(Connector & con);
 
 private:
+	/*! Looks up all segment items belonging to this connector and updates
+		their coordinates.
+		Adds/removes segment items as necessary and updates m_connectorSegmentItems accordingly.
+	*/
+	void updateConnectorSegmentItems(Connector & con);
+
+
 	/*! The network that we own and manage. */
 	Network							*m_network;
 
@@ -55,6 +66,12 @@ private:
 
 	/*! The connector-graphics items that we show on the scene. */
 	QList<ConnectorSegmentItem*>	m_connectorSegmentItems;
+
+	/*! Map to speed up lookup of connectors connected to a block.
+		This map is initialized in createConnectorItems() and updated, whenever a connection is
+		made/removed.
+	*/
+	QMap<const Block*, QSet<Connector*> >	m_blockConnectorMap;
 };
 
 } // namespace BLOCKMOD

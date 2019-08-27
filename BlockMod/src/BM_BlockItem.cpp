@@ -11,6 +11,7 @@
 #include "BM_Block.h"
 #include "BM_Globals.h"
 #include "BM_SocketItem.h"
+#include "BM_SceneManager.h"
 
 namespace BLOCKMOD {
 
@@ -128,9 +129,10 @@ QVariant BlockItem::itemChange(GraphicsItemChange change, const QVariant & value
 		if (m_block->m_pos != pos.toPoint()) {
 			m_moved = true;
 			m_block->m_pos = pos.toPoint();
-			// TODO : modify network
-
-			// TODO : modify connectors
+			// inform network to update connectors
+			SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+			if (sceneManager != nullptr)
+				sceneManager->blockMoved(m_block);
 		}
 		// notify scene of changed scene rect
 		QGraphicsScene * sc = scene();
