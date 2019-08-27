@@ -36,6 +36,11 @@ public:
 	*/
 	void blockMoved(const Block * block);
 
+	/*! Called from ConnectorSegmentItem when a segment was moved to signal the scene manager
+		to adjust the connected connectors.
+	*/
+	void connectorMoved(const Connector * con);
+
 protected:
 
 	/*! Create a graphics item based on the data in the given block.
@@ -55,7 +60,7 @@ private:
 		their coordinates.
 		Adds/removes segment items as necessary and updates m_connectorSegmentItems accordingly.
 	*/
-	void updateConnectorSegmentItems(Connector & con);
+	void updateConnectorSegmentItems(const Connector & con);
 
 
 	/*! The network that we own and manage. */

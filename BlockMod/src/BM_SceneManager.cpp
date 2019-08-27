@@ -70,6 +70,12 @@ void SceneManager::blockMoved(const Block * block) {
 }
 
 
+void SceneManager::connectorMoved(const Connector * con) {
+	// update corresponding connectorItems (maybe remove/add items)
+	updateConnectorSegmentItems(*con);
+}
+
+
 // ** protected functions **
 
 BlockItem * SceneManager::createBlockItem(Block & b) {
@@ -100,11 +106,13 @@ QList<ConnectorSegmentItem *> SceneManager::createConnectorItems(Connector & con
 		ConnectorSegmentItem * item = new ConnectorSegmentItem(&con);
 		item->setLine(startLine);
 		item->m_segmentIdx = -1; // start line
+		item->setAcceptHoverEvents(false); // can't move start segment
 		newConns.append(item);
 
 		item = new ConnectorSegmentItem(&con);
 		item->setLine(endLine);
 		item->m_segmentIdx = -2; // end line
+		item->setAcceptHoverEvents(false); // can't move start segment
 		newConns.append(item);
 
 		QPointF start = startLine.p2();
@@ -133,7 +141,7 @@ QList<ConnectorSegmentItem *> SceneManager::createConnectorItems(Connector & con
 }
 
 
-void SceneManager::updateConnectorSegmentItems(Connector & con) {
+void SceneManager::updateConnectorSegmentItems(const Connector & con) {
 	// lookup corresponding connectorItems
 	ConnectorSegmentItem*	startSegment = nullptr;
 	ConnectorSegmentItem*	endSegment = nullptr;

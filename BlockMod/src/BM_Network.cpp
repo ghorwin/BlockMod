@@ -8,10 +8,12 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <cmath>
 
 #include "BM_Block.h"
 #include "BM_Connector.h"
 #include "BM_XMLHelpers.h"
+#include "BM_Globals.h"
 
 namespace BLOCKMOD {
 
@@ -181,7 +183,7 @@ void Network::adjustConnector(Connector & con) {
 	}
 
 	// remaining distance must be distributed to segments
-	if (dx != 0.0) {
+	if (std::fabs(dx/Globals::GridSpacing) < 1e-6) {
 		// now search for first connector segment that is horizontal
 		int i;
 		for (i=0;i<con.m_segments.count(); ++i) {
@@ -198,7 +200,7 @@ void Network::adjustConnector(Connector & con) {
 			con.m_segments.append(s);
 		}
 	}
-	if (dy != 0.0) {
+	if (std::fabs(dy/Globals::GridSpacing) < 1e-6) {
 		// now search for first connector segment that is vertical
 		int i;
 		for (i=0;i<con.m_segments.count(); ++i) {
