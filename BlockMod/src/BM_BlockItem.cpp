@@ -85,7 +85,7 @@ void BlockItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 
 QVariant BlockItem::itemChange(GraphicsItemChange change, const QVariant & value) {
 	if (change == QGraphicsItem::ItemPositionChange) {
-		// enable snappig
+		// snap to grid
 		QPointF pos = value.toPointF();
 		pos.setX( std::floor(pos.x() / Globals::GridSpacing) * Globals::GridSpacing);
 		pos.setY( std::floor(pos.y() / Globals::GridSpacing) * Globals::GridSpacing);

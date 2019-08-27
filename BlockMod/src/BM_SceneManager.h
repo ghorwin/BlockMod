@@ -46,6 +46,9 @@ public:
 	*/
 	void connectorSegmentMoved(ConnectorSegmentItem * currentItem);
 
+	/*! Toggles high-lighting of connector segments. */
+	void highlightConnectorSegments(const Connector & con, bool highlighted);
+
 protected:
 
 	/*! Create a graphics item based on the data in the given block.

@@ -40,15 +40,10 @@ void SceneManager::setNetwork(const Network & network) {
 	// create new graphics items for connectors
 	for (int i=0; i<m_network->m_connectors.count(); ++i) {
 		QList<ConnectorSegmentItem *> newConns = createConnectorItems(m_network->m_connectors[i]);
-//		QGraphicsPolygonItem * item = new QGraphicsPolygonItem;
-////		item->setPolygon( QPolygonF( network.m_connectors[i].m_points ) );
-//		item->setBrush(Qt::NoBrush);
-//		item->setPen( QPen(Qt::black) );
-//		item->setZValue(1);
 		for( BLOCKMOD::ConnectorSegmentItem * item : newConns) {
 			addItem(item);
 			m_connectorSegmentItems.append(item);
-			qDebug() << item << " : " << item->m_connector << " : " << item->m_segmentIdx << " : " << item->line();
+//			qDebug() << item << " : " << item->m_connector << " : " << item->m_segmentIdx << " : " << item->line();
 		}
 	}
 
@@ -75,6 +70,17 @@ void SceneManager::blockMoved(const Block * block) {
 void SceneManager::connectorSegmentMoved(ConnectorSegmentItem * currentItem) {
 	// update corresponding connectorItems (maybe remove/add items)
 	updateConnectorSegmentItems(*currentItem->m_connector, currentItem);
+}
+
+
+void SceneManager::highlightConnectorSegments(const Connector & con, bool highlighted) {
+	for (ConnectorSegmentItem* segmentItem : m_connectorSegmentItems) {
+		if (segmentItem->m_connector == &con) {
+			segmentItem->m_isHighlighted = highlighted;
+			segmentItem->update();
+		}
+	}
+	this->update();
 }
 
 
@@ -176,10 +182,16 @@ void SceneManager::updateConnectorSegmentItems(const Connector & con, ConnectorS
 		segmentItems.pop_back();
 	}
 
+	bool highlighted = false;
+	if (currentItem != nullptr)
+		highlighted = currentItem->m_isHighlighted;
+	else if (!segmentItems.isEmpty())
+		highlighted = segmentItems.front()->m_isHighlighted;
+
 	// add missing items
 	for (int i=segmentItems.count(); i<itemsNeeded; ++i) {
 		ConnectorSegmentItem * item = new ConnectorSegmentItem(const_cast<Connector*>(&con)); // need to get write access for connector in newly created item
-		qDebug() << "Adding item";
+		item->m_isHighlighted = highlighted;
 		addItem(item);
 		m_connectorSegmentItems.append(item);
 		segmentItems.append(item);
@@ -213,7 +225,6 @@ void SceneManager::updateConnectorSegmentItems(const Connector & con, ConnectorS
 
 		// now all others
 		QPointF start = startLine.p2();
-		qDebug() << "Updating " << con.m_segments.count() << " segments";
 		for (int i=0; i<con.m_segments.count(); ++i) {
 			const Connector::Segment & seg = con.m_segments[i];
 			// create new segment items if new ones have been added in the meantime
@@ -230,7 +241,6 @@ void SceneManager::updateConnectorSegmentItems(const Connector & con, ConnectorS
 			item->setLine(newLine);
 			item->m_segmentIdx = i; // regular line segment
 			start = next;
-//			qDebug() << "[" << i << "] " << newLine;
 		}
 	} catch (...) {
 		// error handling

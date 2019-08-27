@@ -25,7 +25,13 @@ public:
 	*/
 	int			m_segmentIdx;
 
+	/*! If true, the connector segment is painted in highlighted mode. */
+	bool		m_isHighlighted;
+
 protected:
+	/*! Re-implemented to draw the highlighted connection. */
+	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
 	virtual void hoverEnterEvent (QGraphicsSceneHoverEvent *event) override;
 	virtual void hoverLeaveEvent (QGraphicsSceneHoverEvent *event) override;
 
