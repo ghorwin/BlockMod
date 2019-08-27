@@ -48,6 +48,7 @@ void SceneManager::setNetwork(const Network & network) {
 		for( BLOCKMOD::ConnectorSegmentItem * item : newConns) {
 			addItem(item);
 			m_connectorSegmentItems.append(item);
+			qDebug() << item << " : " << item->m_connector << " : " << item->m_segmentIdx << " : " << item->line();
 		}
 	}
 
@@ -154,9 +155,7 @@ void SceneManager::updateConnectorSegmentItems(const Connector & con) {
 			else if (segmentItem->m_segmentIdx == -2)
 				endSegment = segmentItem;
 			else {
-				while (segmentItems.count() <= segmentItem->m_segmentIdx)
-					segmentItems.append(nullptr);
-				segmentItems[segmentItem->m_segmentIdx] = segmentItem;
+				segmentItems.append(segmentItem);
 			}
 		}
 	}
@@ -200,15 +199,18 @@ void SceneManager::updateConnectorSegmentItems(const Connector & con) {
 				qDebug() << "Adding item";
 				addItem(item);
 				m_connectorSegmentItems.append(item);
+				segmentItems.insert(i,item);
 			}
 			else {
 				item = segmentItems[i];
-				if (item == nullptr) {
-					qDebug() << "Adding item";
-					item = new ConnectorSegmentItem(const_cast<Connector*>(&con)); // need to get write access for connector in newly created item
-					addItem(item);
-					m_connectorSegmentItems.append(item);
-				}
+				Q_ASSERT(item != nullptr);
+//				if (item == nullptr) {
+//					qDebug() << "Adding item";
+//					item = new ConnectorSegmentItem(const_cast<Connector*>(&con)); // need to get write access for connector in newly created item
+//					addItem(item);
+//					m_connectorSegmentItems.append(item);
+//					segmentItems[i] = item;
+//				}
 			}
 			QPointF next(start);
 			if (seg.m_direction == Qt::Horizontal)
@@ -221,11 +223,13 @@ void SceneManager::updateConnectorSegmentItems(const Connector & con) {
 			item->setLine(newLine);
 			item->m_segmentIdx = i; // regular line segment
 			start = next;
-			qDebug() << "[" << i << "] " << newLine;
+//			qDebug() << "[" << i << "] " << newLine;
 		}
 	} catch (...) {
 		// error handling
 	}
+	for (auto item : m_connectorSegmentItems)
+		qDebug() << item << " : " << item->m_connector << " : " << item->m_segmentIdx << " : " << item->line();
 }
 
 } // namespace BLOCKMOD

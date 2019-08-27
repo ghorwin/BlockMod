@@ -58,16 +58,17 @@ void ConnectorSegmentItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 
 QVariant ConnectorSegmentItem::itemChange(GraphicsItemChange change, const QVariant & value) {
 	if (change == QGraphicsItem::ItemPositionChange) {
-//		qDebug() << m_segmentIdx;
+//		qDebug() << this;
 		// enable snappig
 		QPointF pF = value.toPointF();
-		QPointF pF2 = pos();
+		QLineF oldLine = line();
 //		qDebug() << "Line position = " << pF2;
 //		qDebug() << "  Last position = " << m_lastPos;
 		pF.setX( std::floor(pF.x() / Globals::GridSpacing) * Globals::GridSpacing);
 		pF.setY( std::floor(pF.y() / Globals::GridSpacing) * Globals::GridSpacing);
 		QPoint p = pF.toPoint();
 		if (m_lastPos != pF.toPoint()) {
+			qDebug() << m_segmentIdx;
 			m_moved = true;
 			QPoint moveDist = p-m_lastPos;
 
@@ -116,26 +117,39 @@ QVariant ConnectorSegmentItem::itemChange(GraphicsItemChange change, const QVari
 
 			// we may have dx or dy left, in this case insert a new segment to the left to compensate the distance
 			if (!Globals::nearZero(dx)) {
-				Connector::Segment newSeg;
-				newSeg.m_direction = Qt::Horizontal;
-				newSeg.m_offset = dx;
-				dx = 0;
-				// always insert as first element - since we checked for the presence of horizontal
-				// segments above, and we know there are none - we can savely assume
-				// that we have no horizontal segment at the begin
-				m_connector->m_segments.insert(0, newSeg);
-				++segIdx; // mind, our own segment index has shifted
-				m_segmentIdx = segIdx;
+				// check, if we can extend the currently selected segment
+				Connector::Segment & seg = m_connector->m_segments[segIdx];
+				if (seg.m_direction == Qt::Horizontal) {
+					seg.m_offset += dx;
+				}
+				else {
+					Connector::Segment newSeg;
+					newSeg.m_direction = Qt::Horizontal;
+					newSeg.m_offset = dx;
+					dx = 0;
+					// always insert as first element - since we checked for the presence of horizontal
+					// segments above, and we know there are none - we can savely assume
+					// that we have no horizontal segment at the begin
+					m_connector->m_segments.insert(0, newSeg);
+					++segIdx; // mind, our own segment index has shifted
+					m_segmentIdx = segIdx;
+				}
 			}
 
 			if (!Globals::nearZero(dy)) {
-				Connector::Segment newSeg;
-				newSeg.m_direction = Qt::Vertical;
-				newSeg.m_offset = dy;
-				dy = 0;
-				m_connector->m_segments.insert(0, newSeg);
-				++segIdx; // mind, our own segment index has shifted
-				m_segmentIdx = segIdx;
+				Connector::Segment & seg = m_connector->m_segments[segIdx];
+				if (seg.m_direction == Qt::Vertical) {
+					seg.m_offset += dy;
+				}
+				else {
+					Connector::Segment newSeg;
+					newSeg.m_direction = Qt::Vertical;
+					newSeg.m_offset = dy;
+					dy = 0;
+					m_connector->m_segments.insert(0, newSeg);
+					++segIdx; // mind, our own segment index has shifted
+					m_segmentIdx = segIdx;
+				}
 			}
 
 
