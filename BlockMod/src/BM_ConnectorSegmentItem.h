@@ -21,6 +21,10 @@ public:
 	*/
 	int			m_segmentIdx;
 
+protected:
+	virtual void hoverEnterEvent (QGraphicsSceneHoverEvent *event) override;
+	virtual void hoverLeaveEvent (QGraphicsSceneHoverEvent *event) override;
+
 };
 
 } // namespace BLOCKMOD
