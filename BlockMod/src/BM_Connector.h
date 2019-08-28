@@ -59,6 +59,12 @@ public:
 			m_offset(offset)
 		{}
 
+		/*! Reads content of the segment from XML stream. */
+		void readXML(QXmlStreamReader & reader);
+
+		/*! Dumps out content of segment to stream writer. */
+		void writeXML(QXmlStreamWriter & writer) const;
+
 		Qt::Orientation m_direction;
 		double m_offset;
 	};
@@ -68,7 +74,6 @@ public:
 
 	/*! Dumps out content of block to stream writer. */
 	void writeXML(QXmlStreamWriter & writer) const;
-
 
 	/*! Unique identification name of this connector instance. */
 	QString						m_name;

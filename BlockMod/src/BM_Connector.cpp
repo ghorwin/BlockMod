@@ -56,13 +56,9 @@ void Connector::readXML(QXmlStreamReader & reader) {
 			else if (ename == "Target") {
 				m_targetSocket = readTextElement(reader);
 			}
-//			else if (ename == "Polygon") {
-//				QString pos = readTextElement(reader);
-//				QStringList p = pos.split(";");
-//				for (int i=0; i<p.count(); ++i) {
-//					m_points.append( decodePoint(p[i]) );
-//				}
-//			}
+			else if (ename == "Segments") {
+				readList(reader, m_segments);
+			}
 			else {
 				// unknown element, skip it and all its child elements
 				reader.raiseError(QString("Found unknown element '%1' in Connector tag.").arg(ename));
@@ -85,19 +81,66 @@ void Connector::writeXML(QXmlStreamWriter & writer) const {
 		writer.writeTextElement("Source", m_sourceSocket);
 	if (!m_targetSocket.isEmpty())
 		writer.writeTextElement("Target", m_targetSocket);
-//	if (!m_points.isEmpty()) {
-//		// encode polygon
-//		QString poly;
-//		for (int i=0; i<m_points.count(); ++i) {
-//			poly += encodePoint(m_points[i]) + ";";
-//		}
-//		if (!poly.isEmpty())
-//			poly.chop(1); // remove trailing ;
-//		writer.writeTextElement("Polygon", poly);
-//	}
+	if (!m_segments.isEmpty()) {
+		writer.writeComment("Connector segments (between start and end lines)");
+		writer.writeStartElement("Segments");
+		for (int i=0; i<m_segments.count(); ++i)
+			m_segments[i].writeXML(writer);
+
+		writer.writeEndElement(); // Segments
+	}
 
 	writer.writeEndElement();
 }
+
+
+void Connector::Segment::readXML(QXmlStreamReader & reader) {
+	Q_ASSERT(reader.isStartElement());
+	// read attributes of Segment element
+	// read child tags
+	while (!reader.atEnd() && !reader.hasError()) {
+		reader.readNext();
+		if (reader.isStartElement()) {
+			QString ename = reader.name().toString();
+			if (ename == "Orientation") {
+				QString orient = readTextElement(reader);
+				if (orient == "Horizontal")
+					m_direction = Qt::Horizontal;
+				else
+					m_direction = Qt::Vertical;
+			}
+			else if (ename == "Offset") {
+				QString offsetStr = readTextElement(reader);
+				bool ok;
+				m_offset = offsetStr.toDouble(&ok);
+				if (!ok) {
+					// unknown element, skip it and all its child elements
+					reader.raiseError(QString("Invalid offset value '%1' in Segment element.").arg(offsetStr));
+					return;
+				}
+			}
+			else {
+				// unknown element, skip it and all its child elements
+				reader.raiseError(QString("Found unknown element '%1' in Segment element.").arg(ename));
+				return;
+			}
+		}
+		else if (reader.isEndElement()) {
+			QString ename = reader.name().toString();
+			if (ename == "Segment")
+				break;// done with XML tag
+		}
+	}
+}
+
+
+void Connector::Segment::writeXML(QXmlStreamWriter & writer) const {
+	writer.writeStartElement("Segment");
+	writer.writeTextElement("Orientation", m_direction == Qt::Horizontal ? "Horizontal" : "Vertical");
+	writer.writeTextElement("Offset", QString("%1").arg(m_offset));
+	writer.writeEndElement();
+}
+
 
 } // namespace BLOCKMOD
 
