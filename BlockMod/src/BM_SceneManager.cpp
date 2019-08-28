@@ -3,6 +3,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsPolygonItem>
 #include <QDebug>
+#include <QApplication>
 
 #include <iostream>
 
@@ -100,6 +101,7 @@ void SceneManager::mergeConnectorSegments(Connector & con) {
 	}
 	// now look for segments with near zero distance
 	int i = 0;
+	bool updateSegments = false;
 	while (i<segmentItems.count()) {
 
 		for (i=0; i<segmentItems.count(); ++i) {
@@ -149,10 +151,31 @@ void SceneManager::mergeConnectorSegments(Connector & con) {
 				--segmentItems[j]->m_segmentIdx;
 
 			// check if new neighbors have same orientation
+			Connector::Segment & previousSeg = con.m_segments[i-1];
+			Connector::Segment & nextSeg = con.m_segments[i];
+			if (previousSeg.m_direction == nextSeg.m_direction) {
+				// extend the previous segment
+				previousSeg.m_offset += nextSeg.m_offset;
+				// remove the next
+				con.m_segments.removeAt(i);
+				ConnectorSegmentItem * segItem = segmentItems[i];
+				segmentItems.removeAt(i);
+				m_connectorSegmentItems.removeOne(segItem);
+				delete segItem;
+				// update segment indexes of remaining segments
+				for (int j=i; j<segmentItems.count(); ++j)
+					--segmentItems[j]->m_segmentIdx;
+				// update segments
+				// remember to update the segment coordinates afterwards
+				updateSegments = true;
+			}
 
 			i = 0; // signal to try again
 		}
 	}
+	if (updateSegments)
+		updateConnectorSegmentItems(con, nullptr);
+	QApplication::setOverrideCursor(Qt::ArrowCursor);
 }
 
 
