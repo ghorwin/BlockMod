@@ -63,7 +63,9 @@ void SceneManager::setNetwork(const Network & network) {
 	*m_network = network;
 
 	qDeleteAll(m_blockItems);
+	m_blockItems.clear();
 	qDeleteAll(m_connectorSegmentItems);
+	m_connectorSegmentItems.clear();
 
 	// create new graphics items
 	for (int i=0; i<m_network->m_blocks.count(); ++i) {

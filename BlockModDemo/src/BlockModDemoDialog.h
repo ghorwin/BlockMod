@@ -23,6 +23,8 @@ private slots:
 
 	void on_toolButtonOpen_clicked();
 
+	void on_toolButtonSave_clicked();
+
 private:
 	Ui::BlockModDemoDialog	*ui;
 

@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include <BM_Network.h>
+#include <BM_Globals.h>
 
 int main(int argc, char *argv[]) {
 	QCoreApplication a(argc, argv);
@@ -24,7 +25,7 @@ int main(int argc, char *argv[]) {
 
 	// read network from file
 	try {
-		network.readXML("demo.net");
+		network.readXML("demo.bm");
 	}
 	catch (std::exception & ex) {
 		qDebug()  << ex.what();
@@ -38,54 +39,76 @@ int main(int argc, char *argv[]) {
 	// clear network
 	network = BLOCKMOD::Network();
 
+	int GX = (int)BLOCKMOD::Globals::GridSpacing;
 	// add content
+	{
+		BLOCKMOD::Block b;
+		b.m_name = "Block1";
+		b.m_pos = QPointF(0,0);
+		b.m_size = QSize(30*GX,20*GX);
 
-	// create new block at coordinates 20,50, using default appearance
-	BLOCKMOD::Block b1("Block1", 20, 50);
-	b1.m_size = QSize(40,100);
+		// add an outlet socket - right
+		BLOCKMOD::Socket s("T_out");
+		s.m_pos = QPointF(b.m_size.width(), 2*GX); // second grid line, right side
+		s.m_inlet = false;
+		s.m_orientation = Qt::Horizontal;
+		b.m_sockets.append(s);
 
-	// create two sockets, one inlet at left and one outlet at right within this block
-	BLOCKMOD::Socket s_left("Left");
-	BLOCKMOD::Socket s_right("Right");
-	s_left.m_pos = QPointF(0,20);
-	s_left.m_inlet = true;
-	s_right.m_pos = QPointF(40+5,20);
-	s_right.m_inlet = false;
-	// uniquely identified by "Block1.Left"
-	b1.m_sockets.append(s_left);
-	// uniquely identified by "Block2.Right"
-	b1.m_sockets.append(s_right); // no error checking done here, must not have two sockets with same name
+		// add an outlet socket - left
+		b.m_sockets.append( BLOCKMOD::Socket("T_out2", QPointF(0, 4*GX), Qt::Horizontal, false) );
+		// add an outlet socket - top
+		b.m_sockets.append( BLOCKMOD::Socket("T_out3", QPointF(6*GX, 0), Qt::Vertical, false) );
+		// add an outlet socket - bottom
+		b.m_sockets.append( BLOCKMOD::Socket("T_out4", QPointF(6*GX, b.m_size.height()), Qt::Vertical, false) );
 
-	// add block to network
-	network.m_blocks.append(b1);
+		network.m_blocks.append(b);
+	}
+	{
+		BLOCKMOD::Block b;
+		b.m_name = "Block2";
+		b.m_pos = QPointF(400,240);
+		b.m_size = QSize(240,160);
 
-	// create new block at coordinates 100,50, using default appearance
-	BLOCKMOD::Block b2("Block2", 100, 50);
-	b2.m_size = QSize(40,100);
+		// add an inlet socket - left
+		BLOCKMOD::Socket s("T_in", QPointF(0, 4*GX), Qt::Horizontal, true);
+		b.m_sockets.append(s);
 
-	// create one inlet socket
-	BLOCKMOD::Socket s_left2("Inlet");
-	s_left2.m_pos = QPointF(0,20);
-	s_left2.m_inlet = true;
-	b2.m_sockets.append(s_left2);
+		// add an inlet socket - right
+		BLOCKMOD::Socket s2("T_in2", QPointF(b.m_size.width(), 6*GX), Qt::Horizontal, true);
+		b.m_sockets.append(s2);
 
-	// add block to network, no error checking done here, must not have two blocks with same ID name
-	network.m_blocks.append(b2);
+		// add an inlet socket - top
+		BLOCKMOD::Socket s3("T_in3", QPointF(4*GX, 0), Qt::Vertical, true);
+		b.m_sockets.append(s3);
 
-	// create connector between outlet and inlet
+		// add an inlet socket - bottom
+		BLOCKMOD::Socket s4("T_in4", QPointF(4*GX, b.m_size.height()), Qt::Vertical, true);
+		b.m_sockets.append(s4);
+
+		network.m_blocks.append(b);
+	}
+
+	// now create connectors between the various blocks and sockets
+
 	BLOCKMOD::Connector con;
 	con.m_name = "Con1";
-	con.m_sourceSocket = "Block1.Right";
-	con.m_targetSocket = "Block2.Inlet";
-
-	con.m_segments.append( BLOCKMOD::Connector::Segment(Qt::Vertical, 0));
+	con.m_sourceSocket = "Block1.T_out";
+	con.m_targetSocket = "Block2.T_in3";
 	con.m_segments.append( BLOCKMOD::Connector::Segment(Qt::Horizontal, 0));
-
+	con.m_segments.append( BLOCKMOD::Connector::Segment(Qt::Vertical, 0));
 	network.m_connectors.append(con);
+
+	con.m_name = "Con2";
+	con.m_sourceSocket = "Block1.T_out4";
+	con.m_targetSocket = "Block2.T_in2";
+	con.m_segments.clear();
+	network.m_connectors.append(con);
+
+	network.adjustConnectors();
 
 	// write network to file
 
-	network.writeXML("demo.net");
+	network.writeXML("demo.bm");
 
 	// return exit code to environment
 	return EXIT_SUCCESS;
