@@ -17,6 +17,7 @@ import glob
 
 # The prefix expected prior to class name when composing filenames
 NAMESPACE_PREFIX = "BLOCKMOD_"
+FILENAME_PREFIX = "BM_"
 
 def process_header(hdr, licenseText):
 	# open file and read all lines
@@ -45,8 +46,8 @@ def process_header(hdr, licenseText):
 					break
 		if len(className) != 0:
 			# check if classname and hdr_guard match
-			if NAMESPACE_PREFIX + className + 'H' != hdr_guard:
-				print 'WARNING: mismatch of class name "'+className+'" ('+NAMESPACE_PREFIX + className + ') and file name for file: '''+ hdr+''
+			if FILENAME_PREFIX + className + 'H' != hdr_guard:
+				print 'WARNING: mismatch of class name "'+className+'" ('+FILENAME_PREFIX + className + ') and file name for file: '''+ hdr+''
 				
 		# now create new file content
 		new_content = ""
