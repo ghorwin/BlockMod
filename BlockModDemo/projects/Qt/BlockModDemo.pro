@@ -23,9 +23,11 @@ LIBS += -L../../../lib$${DIR_PREFIX} \
 RESOURCES += ../../resources/BlockModDemo.qrc
 
 HEADERS += \
-	../../src/BlockModDemoDebugApplication.h
+	../../src/BlockModDemoDebugApplication.h \
+	../../src/BlockModDemoDialog.h
 SOURCES += \
 	../../src/BlockModDemoDebugApplication.cpp \
+	../../src/BlockModDemoDialog.cpp \
 	../../src/main.cpp
-FORMS +=
+FORMS += ../../src/BlockModDemoDialog.ui
 

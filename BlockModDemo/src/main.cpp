@@ -6,7 +6,7 @@
 #include <memory>
 #include <iostream>
 
-#include "BlockModAppMainWindow.h"
+#include "BlockModDemoDialog.h"
 #include "BlockModDemoDebugApplication.h"
 
 void qDebugMsgHandler(QtMsgType type, const QMessageLogContext & context, const QString & msg) {
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
 	int res;
 	try { // open scope to control lifetime of main window, ensure that main window instance dies before settings or project handler
 
-		BlockModAppMainWindow w;
+		BlockModDemoDialog w;
 
 #if defined(Q_OS_WIN)
 		w.showMaximized();
