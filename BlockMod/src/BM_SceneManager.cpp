@@ -9,6 +9,7 @@
 #include "BM_Network.h"
 #include "BM_BlockItem.h"
 #include "BM_ConnectorSegmentItem.h"
+#include "BM_Globals.h"
 
 namespace BLOCKMOD {
 
@@ -81,6 +82,77 @@ void SceneManager::highlightConnectorSegments(const Connector & con, bool highli
 		}
 	}
 	this->update();
+}
+
+
+void SceneManager::mergeConnectorSegments(Connector & con) {
+	// collect an ordered list of segment items
+	QList<ConnectorSegmentItem*> segmentItems;
+	for (int i=0; i<con.m_segments.count(); ++i)
+		segmentItems.append(nullptr);
+	for (ConnectorSegmentItem* segmentItem : m_connectorSegmentItems) {
+		if (segmentItem->m_connector == &con) {
+			if (segmentItem->m_segmentIdx == -1 || segmentItem->m_segmentIdx == -2)
+				continue;
+			Q_ASSERT(segmentItem->m_segmentIdx < segmentItems.count());
+			segmentItems[segmentItem->m_segmentIdx] = segmentItem;
+		}
+	}
+	// now look for segments with near zero distance
+	int i = 0;
+	while (i<segmentItems.count()) {
+
+		for (i=0; i<segmentItems.count(); ++i) {
+			ConnectorSegmentItem * segItem = segmentItems[i];
+			Q_ASSERT(i == segItem->m_segmentIdx);
+			Connector::Segment & seg = con.m_segments[i];
+
+			if (Globals::nearZero(seg.m_offset)) {
+				break;
+			}
+		}
+
+		if (i == segmentItems.count())
+			break; // none found, we are done
+
+		// if i < segmentItems.count() we have found a zero length segment
+		// if this is the first or last segment, we can simply remove it
+		if (i == 0) {
+			con.m_segments.removeFirst();
+			ConnectorSegmentItem * segItem = segmentItems.front();
+			segmentItems.removeFirst();
+			m_connectorSegmentItems.removeOne(segItem);
+			delete segItem;
+			// update segment indexes of remaining segments
+			for (int j=0; j<segmentItems.count(); ++j)
+				--segmentItems[j]->m_segmentIdx;
+		}
+		else if (i == segmentItems.count()-1) {
+			con.m_segments.removeLast();
+			ConnectorSegmentItem * segItem = segmentItems.back();
+			segmentItems.removeLast();
+			m_connectorSegmentItems.removeOne(segItem);
+			delete segItem;
+			i = 0; // signal to try again
+		}
+		else {
+			// segment is somewhere in the middle
+
+			// remove the segment in question
+			con.m_segments.removeAt(i);
+			ConnectorSegmentItem * segItem = segmentItems[i];
+			segmentItems.removeAt(i);
+			m_connectorSegmentItems.removeOne(segItem);
+			delete segItem;
+			// update segment indexes of remaining segments
+			for (int j=i; j<segmentItems.count(); ++j)
+				--segmentItems[j]->m_segmentIdx;
+
+			// check if new neighbors have same orientation
+
+			i = 0; // signal to try again
+		}
+	}
 }
 
 

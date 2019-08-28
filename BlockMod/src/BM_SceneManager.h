@@ -49,6 +49,11 @@ public:
 	/*! Toggles high-lighting of connector segments. */
 	void highlightConnectorSegments(const Connector & con, bool highlighted);
 
+	/*! This function removes line segments with 0 offset and merges the neighboring segments into one.
+		Must not be called from within a move operation (only, for example, from mouse-release event handlers).
+	*/
+	void mergeConnectorSegments(Connector & con);
+
 protected:
 
 	/*! Create a graphics item based on the data in the given block.

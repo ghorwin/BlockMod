@@ -18,7 +18,7 @@ ConnectorSegmentItem::ConnectorSegmentItem(Connector * connector) :
 	m_segmentIdx(-1),
 	m_isHighlighted(false)
 {
-	setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);
+	setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
 	setAcceptHoverEvents(true);
 }
 
@@ -34,13 +34,27 @@ void ConnectorSegmentItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 	if (m_isHighlighted) {
 		QPen p;
 		p.setWidthF(2);
-		p.setColor(QColor(0,0,96));
+		p.setColor(QColor(0,0,110));
+		if (isSelected()) {
+			p.setColor(QColor(192,0,0));
+			p.setStyle(Qt::DashLine);
+		}
 		painter->setPen(p);
 		QLineF l = line();
 		painter->drawLine(l);
 	}
-	else
-		QGraphicsLineItem::paint(painter, option, widget);
+	else {
+		QPen p;
+		p.setWidthF(1);
+		p.setColor(Qt::black);
+		if (isSelected()) {
+			p.setColor(QColor(192,0,0));
+			p.setStyle(Qt::DashLine);
+		}
+		painter->setPen(p);
+		QLineF l = line();
+		painter->drawLine(l);
+	}
 	painter->restore();
 }
 
@@ -83,6 +97,9 @@ void ConnectorSegmentItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 	}
 	QGraphicsLineItem::mouseReleaseEvent(event);
 	m_moved = false;
+	SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+	if (sceneManager != nullptr)
+		sceneManager->mergeConnectorSegments(*m_connector);
 }
 
 
