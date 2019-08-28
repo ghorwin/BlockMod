@@ -1,1 +1,10 @@
-<RCC/>
+<RCC>
+    <qresource prefix="/">
+        <file>gfx/filenew_32x32.png</file>
+        <file>gfx/fileopen_32x32.png</file>
+        <file>gfx/filesave_32x32.png</file>
+        <file>gfx/minus.png</file>
+        <file>gfx/plus.png</file>
+        <file>gfx/info_32x32.png</file>
+    </qresource>
+</RCC>

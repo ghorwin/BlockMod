@@ -13,48 +13,96 @@
   <property name="windowTitle">
    <string>BlockMod Library Demo/Test</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,1,0" columnstretch="2,0">
+  <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0" colspan="2">
     <widget class="QWidget" name="widget_2" native="true">
-     <widget class="QToolButton" name="toolButtonNew">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>10</y>
-        <width>26</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>...</string>
-      </property>
-     </widget>
-     <widget class="QToolButton" name="toolButtonOpen">
-      <property name="geometry">
-       <rect>
-        <x>80</x>
-        <y>10</y>
-        <width>26</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>...</string>
-      </property>
-     </widget>
-     <widget class="QToolButton" name="toolButtonSave">
-      <property name="geometry">
-       <rect>
-        <x>130</x>
-        <y>10</y>
-        <width>26</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>...</string>
-      </property>
-     </widget>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QToolButton" name="toolButtonNew">
+        <property name="icon">
+         <iconset resource="../resources/BlockModDemo.qrc">
+          <normaloff>:/gfx/filenew_32x32.png</normaloff>:/gfx/filenew_32x32.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButtonOpen">
+        <property name="icon">
+         <iconset resource="../resources/BlockModDemo.qrc">
+          <normaloff>:/gfx/fileopen_32x32.png</normaloff>:/gfx/fileopen_32x32.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButtonSave">
+        <property name="icon">
+         <iconset resource="../resources/BlockModDemo.qrc">
+          <normaloff>:/gfx/filesave_32x32.png</normaloff>:/gfx/filesave_32x32.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButtonInfo">
+        <property name="icon">
+         <iconset resource="../resources/BlockModDemo.qrc">
+          <normaloff>:/gfx/info_32x32.png</normaloff>:/gfx/info_32x32.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>32</width>
+          <height>32</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </widget>
    </item>
    <item row="1" column="0">
@@ -80,15 +128,29 @@
       </item>
       <item row="0" column="1">
        <widget class="QToolButton" name="toolButtonAddSocket">
-        <property name="text">
-         <string>...</string>
+        <property name="icon">
+         <iconset resource="../resources/BlockModDemo.qrc">
+          <normaloff>:/gfx/plus.png</normaloff>:/gfx/plus.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
        <widget class="QToolButton" name="toolButtonRemoveSocket">
-        <property name="text">
-         <string>...</string>
+        <property name="icon">
+         <iconset resource="../resources/BlockModDemo.qrc">
+          <normaloff>:/gfx/minus.png</normaloff>:/gfx/minus.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>24</width>
+          <height>24</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -136,6 +198,8 @@
    <header>BM_ZoomMeshGraphicsView.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/BlockModDemo.qrc"/>
+ </resources>
  <connections/>
 </ui>
