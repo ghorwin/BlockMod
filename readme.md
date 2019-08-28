@@ -15,6 +15,10 @@ User interaction:
 - moving blocks around, hereby keeping the connections and adjusting their geometry automatically
 - defining block geometry and their socket types and positions; when modifying existing blocks keep connections previously made (except when a socket is removed)
 
+Take a look at the following animation, which illustrates the basic functionality:
+
+![](BlockMod/doc/Functionality_2019-08-28.gif)
+
 Data handling:
 
 - access/retrieve data structure
@@ -65,4 +69,3 @@ Data members/objects refer to each other via pointer links. Care has to be taken
 Note: when any of the vectors of the network's data structures change, the memory location of these blocks/connectors may become invalid. Graphics items still pointing to that memory may cause access violations. Thus, any change of network's data structures must yield an update of the respective Graphics items.
 
 Hence, the scene manager also handles any changes to the underlying data structures and provides functions for adding/removing blocks, connectors, sockets etc.
-
