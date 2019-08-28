@@ -51,7 +51,12 @@ public:
 
 	QRectF boundingRect() const override;
 
+	void setHoverEnabled(bool enabled);
+
 protected:
+	virtual void hoverEnterEvent (QGraphicsSceneHoverEvent *event) override;
+	virtual void hoverLeaveEvent (QGraphicsSceneHoverEvent *event) override;
+
 	/*! Re-implemented to draw the styled rectangle of the block. */
 	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
@@ -62,6 +67,9 @@ private:
 
 	/*! The bounding rectangle of the symbol (updated whenever content of the socket changes). */
 	QRectF	m_symbolRect;
+
+	bool	m_hoverEnabled;
+	bool	m_hovered;
 };
 
 } // namespace BLOCKMOD

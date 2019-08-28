@@ -49,6 +49,7 @@ public:
 	*/
 	explicit BlockItem(Block * b);
 
+	const Block * block() const { return m_block; }
 
 protected:
 	/*! This function is called from the constructor and creates child socket items. */

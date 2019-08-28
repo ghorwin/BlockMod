@@ -44,6 +44,7 @@ namespace BLOCKMOD {
 class Network;
 class Block;
 class BlockItem;
+class Socket;
 class Connector;
 class ConnectorSegmentItem;
 
@@ -86,6 +87,9 @@ public:
 		Must not be called from within a move operation (only, for example, from mouse-release event handlers).
 	*/
 	void mergeConnectorSegments(Connector & con);
+
+	/*! Quick test if a socket is connected anywhere by a connector. */
+	bool isConnectedSocket(const Block * b, const Socket * s) const;
 
 protected:
 

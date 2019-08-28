@@ -70,6 +70,11 @@ void BlockItem::createSocketItems() {
 	for (Socket & s : m_block->m_sockets) {
 		// create a socket item
 		SocketItem * item = new SocketItem(this, &s);
+		// enable hover-highlight on outlet nodes
+		if (!s.m_inlet) {
+			item->setHoverEnabled(true);
+			item->setZValue(20); // outlet nodes are drawn over lines
+		}
 		m_socketItems.append(item);
 	}
 }

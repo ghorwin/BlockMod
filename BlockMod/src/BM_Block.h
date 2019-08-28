@@ -56,7 +56,7 @@ namespace BLOCKMOD {
 */
 class Block {
 public:
-	Block() {}
+	Block() : m_connectionHelperBlock(false) {}
 
 	Block(const QString & name);
 	Block(const QString & name, double x, double y);
@@ -86,6 +86,11 @@ public:
 
 	/*! Custom properties. */
 	QMap<QString, QVariant>		m_properties;
+
+	/*! If true, this block is only a virtual block with a single socket, that is invisible (not painted)
+		and only exists, until the connected has been attached to a socket of another block.
+	*/
+	bool						m_connectionHelperBlock;
 };
 
 } // namespace BLOCKMOD

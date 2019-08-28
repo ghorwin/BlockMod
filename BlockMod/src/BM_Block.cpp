@@ -44,13 +44,15 @@ namespace BLOCKMOD {
 
 Block::Block(const QString & name) :
 	m_name(name),
-	m_pos(0,0)
+	m_pos(0,0),
+	m_connectionHelperBlock(false)
 {
 }
 
 Block::Block(const QString & name, double x, double y) :
 	m_name(name),
-	m_pos(x,y)
+	m_pos(x,y),
+	m_connectionHelperBlock(false)
 {
 }
 

@@ -46,6 +46,16 @@ void BlockModDemoDialog::on_toolButtonOpen_clicked() {
 	try {
 		n.readXML(fname);
 		n.checkNames();
+		QList<BLOCKMOD::Connector> checkedCons;
+		// remove invalid connections and fix any connectors that might miss a bit
+		for (BLOCKMOD::Connector & con : n.m_connectors) {
+			try {
+				n.adjustConnector(con);
+				checkedCons.append(con);
+			}
+			catch (...) {}
+		}
+		n.m_connectors.swap(checkedCons);
 		m_sceneManager->setNetwork(n); // network is copied
 	} catch (std::runtime_error & e) {
 		QString errormsg(e.what());

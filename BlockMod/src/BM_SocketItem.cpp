@@ -38,16 +38,20 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsScene>
 #include <QFontMetrics>
+#include <QDebug>
 
 #include "BM_Socket.h"
 #include "BM_BlockItem.h"
 #include "BM_Globals.h"
+#include "BM_SceneManager.h"
 
 namespace BLOCKMOD {
 
 SocketItem::SocketItem(BlockItem * parent, Socket * socket) :
 	QGraphicsItem (parent),
-	m_socket(socket)
+	m_socket(socket),
+	m_hoverEnabled(false),
+	m_hovered(false)
 {
 	if (m_socket->m_inlet) {
 		switch (m_socket->direction()) {
@@ -65,7 +69,8 @@ SocketItem::SocketItem(BlockItem * parent, Socket * socket) :
 			case Socket::Bottom		: m_symbolRect = QRectF(m_socket->m_pos.x()-4, m_socket->m_pos.y(), 8, 8); break;
 		}
 	}
-	setZValue(12); // painted on top of block
+	setZValue(12);
+	setAcceptHoverEvents(true);
 }
 
 
@@ -74,7 +79,25 @@ QRectF SocketItem::boundingRect() const {
 }
 
 
+void SocketItem::setHoverEnabled(bool enabled) {
+	m_hoverEnabled = enabled;
+	if (!enabled)
+		m_hovered = false;
+	update();
+}
+
 // *** protected functions ***
+
+void SocketItem::hoverEnterEvent (QGraphicsSceneHoverEvent *event) {
+	if (m_hoverEnabled)
+		m_hovered = true;
+	QGraphicsItem::hoverEnterEvent(event);
+}
+
+void SocketItem::hoverLeaveEvent (QGraphicsSceneHoverEvent *event) {
+	m_hovered = false;
+	QGraphicsItem::hoverLeaveEvent(event);
+}
 
 void SocketItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 			QWidget */*widget*/)
@@ -119,6 +142,27 @@ void SocketItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 				painter->drawArc(r, 0*16, 180*16);
 			break;
 		}
+		// if socket is connected, paint a circle
+		SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+		BlockItem * blockItem = dynamic_cast<BlockItem *>(parentItem());
+		if (sceneManager != nullptr && blockItem != nullptr && sceneManager->isConnectedSocket(blockItem->block(), m_socket)) {
+			painter->save();
+			painter->setPen(Qt::NoPen);
+			painter->setBrush(Qt::black);
+			QRectF r2(r.x()+2, r.y()+2, r.width() - 4, r.height() - 4);
+			painter->drawEllipse(r2);
+			painter->restore();
+		}
+
+		if (m_hovered) {
+			painter->save();
+			QPen p(QColor(192,0,0), 0.8);
+			painter->setPen(p);
+			painter->setBrush(QBrush(QColor(96,0,0)));
+			QRectF r2(r.x()+0.5, r.y()+0.5, r.width() - 1, r.height() - 1);
+			painter->drawEllipse(r2);
+			painter->restore();
+		}
 //		if (option->state & QStyle::State_Selected) {
 //			painter->setPen(QPen(QBrush(QColor(0,96,0)), 1.5));
 //		}
@@ -158,7 +202,10 @@ void SocketItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 		QPen pen(Qt::black);
 		pen.setCapStyle(Qt::RoundCap);
 		painter->setPen(pen);
-		painter->setBrush(QColor(0,0,96));
+		if (m_hovered)
+			painter->fillPath(p, Qt::white);
+		else
+			painter->setBrush(QColor(0,0,196));
 		painter->drawPath(p);
 	}
 

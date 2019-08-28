@@ -207,7 +207,7 @@ void Network::adjustConnector(Connector & con) {
 	double dx = endLine.p2().x() - startLine.p2().x();
 	double dy = endLine.p2().y() - startLine.p2().y();
 
-	// now suptract the distance already covered by existing segments
+	// now subtract the distance already covered by existing segments
 	for (int i=0;i<con.m_segments.count(); ++i) {
 		if (con.m_segments[i].m_direction == Qt::Horizontal)
 			dx -= con.m_segments[i].m_offset;

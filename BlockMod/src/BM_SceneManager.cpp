@@ -41,6 +41,7 @@
 #include <iostream>
 
 #include "BM_Network.h"
+#include "BM_Socket.h"
 #include "BM_BlockItem.h"
 #include "BM_ConnectorSegmentItem.h"
 #include "BM_Globals.h"
@@ -214,6 +215,25 @@ void SceneManager::mergeConnectorSegments(Connector & con) {
 }
 
 
+bool SceneManager::isConnectedSocket(const Block * b, const Socket * s) const {
+	QMap<const Block*, QSet<Connector*> >::const_iterator it = m_blockConnectorMap.find(b);
+	if (it == m_blockConnectorMap.end())
+		return false;
+	// process all connectors and check, if they connect to the given socket
+	for (const Connector * c : it.value() ) {
+		const Socket * socket;
+		const Block * block;
+		m_network->lookupBlockAndSocket(c->m_sourceSocket, block, socket);
+		if (s == socket)
+			return true;
+		m_network->lookupBlockAndSocket(c->m_targetSocket, block, socket);
+		if (s == socket)
+			return true;
+	}
+	return false;
+}
+
+
 // ** protected functions **
 
 BlockItem * SceneManager::createBlockItem(Block & b) {
@@ -378,5 +398,6 @@ void SceneManager::updateConnectorSegmentItems(const Connector & con, ConnectorS
 //	for (auto item : m_connectorSegmentItems)
 //		qDebug() << item << " : " << item->m_connector << " : " << item->m_segmentIdx << " : " << item->line();
 }
+
 
 } // namespace BLOCKMOD

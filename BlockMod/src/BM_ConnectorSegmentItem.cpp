@@ -53,6 +53,7 @@ ConnectorSegmentItem::ConnectorSegmentItem(Connector * connector) :
 {
 	setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
 	setAcceptHoverEvents(true);
+	setZValue(5); // below block
 }
 
 
@@ -102,6 +103,7 @@ void ConnectorSegmentItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 	SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
 	if (sceneManager != nullptr)
 		sceneManager->highlightConnectorSegments(*m_connector, true);
+	QGraphicsLineItem::hoverEnterEvent(event);
 }
 
 
@@ -112,6 +114,7 @@ void ConnectorSegmentItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 	SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
 	if (sceneManager != nullptr)
 		sceneManager->highlightConnectorSegments(*m_connector, false);
+	QGraphicsLineItem::hoverLeaveEvent(event);
 }
 
 
