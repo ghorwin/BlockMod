@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include "BlockModAppMainWindow.h"
-#include "BlockModAppDebugApplication.h"
+#include "BlockModDemoDebugApplication.h"
 
 void qDebugMsgHandler(QtMsgType type, const QMessageLogContext & context, const QString & msg) {
 	(void) type;

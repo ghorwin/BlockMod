@@ -1,4 +1,4 @@
-#include "BlockModAppDebugApplication.h"
+#include "BlockModDemoDebugApplication.h"
 
 #include <iostream>
 
