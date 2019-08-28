@@ -116,9 +116,11 @@ int main(int argc, char *argv[]) {
 		w->showMaximized();
 #elif defined(Q_OS_LINUX)
 		w->show();
+		w->resize(800,600);
 #else
 		w->show();
 #endif
+
 
 		// start event loop
 		res = a.exec();
