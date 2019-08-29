@@ -100,7 +100,7 @@ void SocketItem::hoverLeaveEvent (QGraphicsSceneHoverEvent *event) {
 }
 
 void SocketItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-			QWidget */*widget*/)
+			QWidget * /*widget*/ )
 {
 	painter->save();
 	painter->setRenderHint(QPainter::Antialiasing, true);

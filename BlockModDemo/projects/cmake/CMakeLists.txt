@@ -50,7 +50,7 @@ if( WIN32 )
 					 ${APP_SRCS} ${APP_MOC_SRCS} ${APP_RC_SRCS} ${APP_UI_SRCS} ${APP_WIN_RC}
 	)
 
-	set(WIN_FRAMEWORKS iphlpapi EmfEngine gdiplus gdi32 user32 ole32)
+	set(WIN_FRAMEWORKS iphlpapi  gdiplus gdi32 user32 ole32)
 
 endif( WIN32 )
 

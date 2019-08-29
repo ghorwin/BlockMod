@@ -36,6 +36,8 @@ popd
 
 :: copy executable to bin/release dir
 xcopy /Y .\bb_VC_x64\BlockModDemo\BlockModDemo.exe ..\..\bin\release_x64
+xcopy /Y .\bb_VC_x64\BlockModTests\SerializationTest.exe ..\..\bin\release_x64
+xcopy /Y .\bb_VC_x64\BlockModTests\ShowNetworkTest.exe ..\..\bin\release_x64
 
 exit /b 0
 
