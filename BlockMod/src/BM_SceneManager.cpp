@@ -45,6 +45,7 @@
 #include "BM_BlockItem.h"
 #include "BM_ConnectorSegmentItem.h"
 #include "BM_Globals.h"
+#include "BM_SocketItem.h"
 
 namespace BLOCKMOD {
 
@@ -231,6 +232,63 @@ bool SceneManager::isConnectedSocket(const Block * b, const Socket * s) const {
 			return true;
 	}
 	return false;
+}
+
+
+void SceneManager::enterConnectMode(const SocketItem & outletSocketItem) {
+	Q_ASSERT(!outletSocketItem.socket()->m_inlet);
+	// TODO : add flag to enable/disable connect mode
+
+	// determine block that this outlet socket item belongs to
+	BlockItem * bitem = dynamic_cast<BlockItem *>(outletSocketItem.parentItem());
+	Q_ASSERT(bitem != nullptr);
+	const Block * sourceBlock = bitem->block();
+	const Socket * sourceSocket = outletSocketItem.socket();
+	// compose connector start name
+	QString startSocketName = sourceBlock->m_name + "." + sourceSocket->m_name;
+
+	// create a dummy block
+	Block dummyBlock;
+	QPointF p(sourceSocket->m_pos);
+	p += sourceBlock->m_pos;
+	dummyBlock.m_pos = p;
+	dummyBlock.m_size = QSizeF(20,20);
+	dummyBlock.m_name = Globals::InvisibleLabel; // "Mich gibt's gar nicht";
+	dummyBlock.m_connectionHelperBlock = true;
+	Socket dummySocket;
+	dummySocket.m_name = Globals::InvisibleLabel; // "Mich gibt's auch nicht";
+	dummySocket.m_inlet = true;
+	dummySocket.m_orientation = Qt::Horizontal;
+	dummySocket.m_pos = QPointF(0,0);
+	dummyBlock.m_sockets.append(dummySocket);
+
+	m_network->m_blocks.append(dummyBlock); // does not invalidate block pointers!
+
+	QString targetSocketName = dummyBlock.m_name + "." + dummySocket.m_name;
+
+	// create and add the connector
+	Connector con;
+	con.m_name = Globals::InvisibleLabel; // "Mich gibt's erst recht nicht";
+	con.m_sourceSocket = startSocketName;
+	con.m_targetSocket = targetSocketName;
+	m_network->m_connectors.append(con);
+
+	// now create block item and connector items
+	BlockItem * bi = createBlockItem(m_network->m_blocks.back()); // Mind: always pass the object in the m_block list
+	m_blockItems.append(bi);
+	addItem(bi);
+
+	QList<ConnectorSegmentItem*> newConns = createConnectorItems(m_network->m_connectors.back());  // Mind: always pass the object in the m_connectors list
+	for( BLOCKMOD::ConnectorSegmentItem * item : newConns) {
+		addItem(item);
+		m_connectorSegmentItems.append(item);
+	}
+
+}
+
+
+void SceneManager::leaveConnectMode(const BlockItem & connectionBlock) {
+
 }
 
 

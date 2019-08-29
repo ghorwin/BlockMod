@@ -26,6 +26,8 @@ private slots:
 	void on_toolButtonSave_clicked();
 
 private:
+	void loadNetwork(const QString & fname);
+
 	Ui::BlockModDemoDialog	*ui;
 
 	BLOCKMOD::SceneManager	*m_sceneManager;

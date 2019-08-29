@@ -53,12 +53,18 @@ public:
 
 	void setHoverEnabled(bool enabled);
 
+	/*! Returns pointer to socket. */
+	const Socket * socket() const { return m_socket; }
+
 protected:
 	virtual void hoverEnterEvent (QGraphicsSceneHoverEvent *event) override;
 	virtual void hoverLeaveEvent (QGraphicsSceneHoverEvent *event) override;
 
 	/*! Re-implemented to draw the styled rectangle of the block. */
 	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+	/*! Only works for outlet socket items, puts the scene in connection mode. */
+	virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
 

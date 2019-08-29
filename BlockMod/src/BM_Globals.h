@@ -47,6 +47,8 @@ public:
 	static double GridSpacing;
 
 	static double LabelFontSize;
+
+	static const char * const InvisibleLabel;
 };
 
 } // namespace BLOCKMOD

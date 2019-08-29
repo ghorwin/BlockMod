@@ -45,6 +45,7 @@ class Network;
 class Block;
 class BlockItem;
 class Socket;
+class SocketItem;
 class Connector;
 class ConnectorSegmentItem;
 
@@ -91,6 +92,18 @@ public:
 	/*! Quick test if a socket is connected anywhere by a connector. */
 	bool isConnectedSocket(const Block * b, const Socket * s) const;
 
+	/*! Called from a socket item, so that the scene is put into connection mode.
+		This means:
+		- a virtual (invisible) block is created with a single inlet connector, the start line
+			of this invisible block has zero length.
+		- a connector between the virtual block and the current socket is created
+		- all unconnected inlet sockets are marked as highlightable
+		- all outlet sockets are marked as not highlightable
+	*/
+	void enterConnectMode(const SocketItem & outletSocketItem);
+
+	void leaveConnectMode(const BlockItem & connectionBlock);
+
 protected:
 
 	/*! Create a graphics item based on the data in the given block.
@@ -131,6 +144,7 @@ private:
 		made/removed.
 	*/
 	QMap<const Block*, QSet<Connector*> >	m_blockConnectorMap;
+
 };
 
 } // namespace BLOCKMOD

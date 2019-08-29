@@ -163,13 +163,6 @@ void SocketItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 			painter->drawEllipse(r2);
 			painter->restore();
 		}
-//		if (option->state & QStyle::State_Selected) {
-//			painter->setPen(QPen(QBrush(QColor(0,96,0)), 1.5));
-//		}
-//		else {
-//			grad.setColorAt(0, QColor(196,196,255));
-//			grad.setColorAt(1, QColor(255,255,255));
-//		}
 	}
 	else {
 		QPainterPath p;
@@ -249,6 +242,24 @@ void SocketItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
 	painter->restore();
 }
+
+
+void SocketItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+	// ignore clicks on inlet sockets
+	if (m_socket->m_inlet) {
+		event->ignore();
+		return;
+	}
+	if (event->button() == Qt::LeftButton && event->modifiers() == Qt::NoModifier) {
+		SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+		if (sceneManager) {
+			sceneManager->enterConnectMode(*this);
+			event->ignore(); // needed or fall through?
+		}
+	}
+}
+
+
 
 } // namespace BLOCKMOD
 

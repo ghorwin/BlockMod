@@ -23,6 +23,7 @@ BlockModDemoDialog::BlockModDemoDialog(QWidget *parent) :
 	ui->graphicsView->setResolution(1); // in pix/m
 	ui->graphicsView->setGridStep(80); // 80 pix/m; 8 pix/m for small grid
 
+	loadNetwork("demo.bm");
 }
 
 
@@ -41,7 +42,19 @@ void BlockModDemoDialog::on_toolButtonOpen_clicked() {
 	QString fname = QFileDialog::getOpenFileName(this, tr("Select BlockMod file"), QString(), tr("BlockMod files (*.bm)"));
 	if (fname.isEmpty())
 		return;
+	loadNetwork(fname);
+}
 
+
+void BlockModDemoDialog::on_toolButtonSave_clicked() {
+	QString fname = QFileDialog::getSaveFileName(this, tr("Select BlockMod file"), QString(), tr("BlockMod files (*.bm)"));
+	if (fname.isEmpty())
+		return;
+	m_sceneManager->network().writeXML(fname);
+}
+
+
+void BlockModDemoDialog::loadNetwork(const QString & fname) {
 	BLOCKMOD::Network n;
 	try {
 		n.readXML(fname);
@@ -61,11 +74,4 @@ void BlockModDemoDialog::on_toolButtonOpen_clicked() {
 		QString errormsg(e.what());
 		ui->plainTextEdit->appendPlainText(errormsg + '\n');
 	}
-}
-
-void BlockModDemoDialog::on_toolButtonSave_clicked() {
-	QString fname = QFileDialog::getSaveFileName(this, tr("Select BlockMod file"), QString(), tr("BlockMod files (*.bm)"));
-	if (fname.isEmpty())
-		return;
-	m_sceneManager->network().writeXML(fname);
 }

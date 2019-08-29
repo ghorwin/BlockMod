@@ -42,6 +42,10 @@ bool Globals::nearZero(double gridDistance) {
 }
 
 double Globals::GridSpacing = 8; // in pixel
+
 double Globals::LabelFontSize = 8;
+
+const char * const Globals::InvisibleLabel = "[(-I am invisible-)]";
+
 
 } // namespace BLOCKMOD
