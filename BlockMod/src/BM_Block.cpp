@@ -112,6 +112,13 @@ void Block::writeXML(QXmlStreamWriter & writer) const {
 
 
 QLineF Block::socketStartLine(const Socket * socket) const {
+	// special handling for "invisible" blocks
+
+	if (m_name == Globals::InvisibleLabel) {
+		QPointF startPoint(socket->m_pos);
+		startPoint += m_pos;
+		return QLineF(startPoint, startPoint);
+	}
 	// first determine the direction: top, left, right, bottom
 	QPointF otherPoint = socket->m_pos;
 	switch (socket->direction()) {

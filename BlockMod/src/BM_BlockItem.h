@@ -68,13 +68,13 @@ protected:
 
 private:
 	/*! Pointer to associated block. */
-	Block		*m_block;
+	Block				*m_block;
 
 	/*! Indicates, that the block has been moved. */
-	bool		m_moved;
+	bool				m_moved;
 
 	/*! Our socket items, childs of this block item. */
-	QList<SocketItem*> m_socketItems;
+	QList<SocketItem*>	m_socketItems;
 
 	friend class SceneManager;
 };

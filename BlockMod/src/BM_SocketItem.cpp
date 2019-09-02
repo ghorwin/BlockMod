@@ -44,6 +44,7 @@
 
 #include "BM_Socket.h"
 #include "BM_BlockItem.h"
+#include "BM_Block.h"
 #include "BM_Globals.h"
 #include "BM_SceneManager.h"
 
@@ -104,23 +105,29 @@ void SocketItem::setHoverEnabled(bool enabled) {
 	update();
 }
 
+
 // *** protected functions ***
 
 void SocketItem::hoverEnterEvent (QGraphicsSceneHoverEvent *event) {
-	qDebug() << "Hoverevent";
 	if (m_hoverEnabled)
 		m_hovered = true;
 	QGraphicsItem::hoverEnterEvent(event);
 }
+
 
 void SocketItem::hoverLeaveEvent (QGraphicsSceneHoverEvent *event) {
 	m_hovered = false;
 	QGraphicsItem::hoverLeaveEvent(event);
 }
 
+
 void SocketItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 			QWidget * /*widget*/ )
 {
+	// special handling for invisible blocks
+	BlockItem * bi = dynamic_cast<BlockItem*>(parentItem());
+	if (bi->block()->m_name == Globals::InvisibleLabel)
+		return; // nothing to be drawn
 	painter->save();
 	painter->setRenderHint(QPainter::Antialiasing, true);
 	// Socket items are children of the blocks.
@@ -274,7 +281,10 @@ void SocketItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 		if (event->button() == Qt::LeftButton && event->modifiers() == Qt::NoModifier) {
 			SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
 			if (sceneManager) {
-				sceneManager->startSocketConnection(*this);
+				QPointF p = event->pos(); // this is the position of the socket relative to the parent block
+				p = mapToScene(p); // this is the global scene coordinate
+				qDebug() << "Mouse click at " << p;
+				sceneManager->startSocketConnection(*this, p);
 				event->accept(); // needed or fall through?
 			}
 		}

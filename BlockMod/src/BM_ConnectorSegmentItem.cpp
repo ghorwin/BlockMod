@@ -100,10 +100,12 @@ void ConnectorSegmentItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 	if (sceneManager && sceneManager->isConnectionModeEnabled())
 		return;
 
-	if (line().dx() == 0.0)
-		QApplication::setOverrideCursor(Qt::SplitHCursor);
-	else
-		QApplication::setOverrideCursor(Qt::SplitVCursor);
+	if (m_segmentIdx >= 0) {
+		if (line().dx() == 0.0)
+			QApplication::setOverrideCursor(Qt::SplitHCursor);
+		else
+			QApplication::setOverrideCursor(Qt::SplitVCursor);
+	}
 	// mark all connector segments in this line with a different color or bold
 	if (sceneManager != nullptr)
 		sceneManager->highlightConnectorSegments(*m_connector, true);
@@ -148,7 +150,7 @@ void ConnectorSegmentItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 
 
 QVariant ConnectorSegmentItem::itemChange(GraphicsItemChange change, const QVariant & value) {
-	if (change == QGraphicsItem::ItemPositionChange) {
+	if (change == QGraphicsItem::ItemPositionChange && m_segmentIdx >= 0) {
 		// snap to grid
 		QPointF pF = value.toPointF();
 		pF.setX( std::floor(pF.x() / Globals::GridSpacing) * Globals::GridSpacing);
@@ -178,7 +180,6 @@ QVariant ConnectorSegmentItem::itemChange(GraphicsItemChange change, const QVari
 			// Source/Start-direction
 
 			int segIdx = m_segmentIdx;
-			Q_ASSERT(segIdx >= 0);
 			Q_ASSERT(segIdx < m_connector->m_segments.size());
 
 			double dx = moveDist.x();

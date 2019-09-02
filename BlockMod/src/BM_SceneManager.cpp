@@ -283,7 +283,7 @@ void SceneManager::disableConnectionMode() {
 }
 
 
-void SceneManager::startSocketConnection(const SocketItem & outletSocketItem) {
+void SceneManager::startSocketConnection(const SocketItem & outletSocketItem, const QPointF & mousePos) {
 	Q_ASSERT(!outletSocketItem.socket()->m_inlet);
 	// TODO : add flag to enable/disable connect mode
 
@@ -300,9 +300,9 @@ void SceneManager::startSocketConnection(const SocketItem & outletSocketItem) {
 
 	// create a dummy block
 	Block dummyBlock;
-	QPointF p(sourceSocket->m_pos);
-	p += sourceBlock->m_pos;
-	dummyBlock.m_pos = p;
+//	QPointF p(sourceSocket->m_pos);
+//	p += sourceBlock->m_pos;
+	dummyBlock.m_pos = mousePos;
 	dummyBlock.m_size = QSizeF(20,20);
 	dummyBlock.m_name = Globals::InvisibleLabel; // "Mich gibt's gar nicht";
 	dummyBlock.m_connectionHelperBlock = true;
@@ -326,7 +326,13 @@ void SceneManager::startSocketConnection(const SocketItem & outletSocketItem) {
 
 	// now create block item and connector items
 	BlockItem * bi = createBlockItem(m_network->m_blocks.back()); // Mind: always pass the object in the m_block list
+	bi->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+	bi->setPos(dummyBlock.m_pos);
+	bi->grabMouse();
 	m_blockItems.append(bi);
+
+	bi->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
+	bi->setPos(dummyBlock.m_pos);
 
 	addItem(bi);
 
@@ -410,23 +416,6 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 	if (!alreadyInConnectionProcess && inConnectionProcess) {
 		// make the last item the mouse grabber objects
 		m_blockItems.back()->grabMouse();
-//		QGraphicsView* view = views()[0];
-//		QPointF ptScene = mouseEvent->pos();
-//		QPoint ptView = view->mapFromScene(ptScene);
-//		QPoint ptGlobal = view->viewport()->mapToGlobal(ptView);
-
-//		QGraphicsSceneMouseEvent event2(QEvent::GraphicsSceneMousePress);
-//		event2.setLastPos(mouseEvent->lastPos());
-//		event2.setLastScenePos(mouseEvent->lastScenePos());
-//		event2.setScenePos(ptScene);
-//		event2.setPos(ptScene);
-//		event2.setScreenPos(ptGlobal);
-//		event2.setButton(Qt::LeftButton);
-//		event2.setButtons(Qt::LeftButton);
-//		event2.setModifiers(QApplication::keyboardModifiers());
-
-//		mouseEvent->setAccepted(false);
-//		qApp->sendEvent(this, mouseEvent);
 	}
 
 }
@@ -474,13 +463,11 @@ QList<ConnectorSegmentItem *> SceneManager::createConnectorItems(Connector & con
 		ConnectorSegmentItem * item = new ConnectorSegmentItem(&con);
 		item->setLine(startLine);
 		item->m_segmentIdx = -1; // start line
-		item->setAcceptHoverEvents(false); // can't move start segment
 		newConns.append(item);
 
 		item = new ConnectorSegmentItem(&con);
 		item->setLine(endLine);
 		item->m_segmentIdx = -2; // end line
-		item->setAcceptHoverEvents(false); // can't move start segment
 		newConns.append(item);
 
 		QPointF start = startLine.p2();

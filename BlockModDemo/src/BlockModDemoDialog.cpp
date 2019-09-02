@@ -5,6 +5,7 @@
 
 #include <QGridLayout>
 #include <QFileDialog>
+#include <QDebug>
 
 #include <BM_SceneManager.h>
 #include <BM_Network.h>
@@ -73,7 +74,7 @@ void BlockModDemoDialog::loadNetwork(const QString & fname) {
 		m_sceneManager->setNetwork(n); // network is copied
 	} catch (std::runtime_error & e) {
 		QString errormsg(e.what());
-		ui->plainTextEdit->appendPlainText(errormsg + '\n');
+		qDebug() << errormsg;
 	}
 }
 

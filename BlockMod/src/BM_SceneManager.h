@@ -56,7 +56,7 @@ public:
 	explicit SceneManager(QObject *parent = nullptr);
 
 	/*! D-tor. */
-	virtual ~SceneManager();
+	virtual ~SceneManager() override;
 
 	/*! Set a new network (a local copy is made of the network object).
 		This will recreate the entire scene.
@@ -118,7 +118,7 @@ public:
 		- all unconnected inlet sockets are marked as highlightable
 		- all outlet sockets are marked as not highlightable
 	*/
-	void startSocketConnection(const SocketItem & outletSocketItem);
+	void startSocketConnection(const SocketItem & outletSocketItem, const QPointF & mousePos);
 
 
 	// functions to modify managed network

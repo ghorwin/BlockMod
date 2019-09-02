@@ -83,6 +83,9 @@ void BlockItem::createSocketItems() {
 void BlockItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 			QWidget */*widget*/)
 {
+	// special handling for invisible blocks
+	if (m_block->m_name == Globals::InvisibleLabel)
+		return; // nothing to be drawn
 	painter->save();
 	painter->setRenderHint(QPainter::Antialiasing, true);
 	QLinearGradient grad(QPointF(0,0), QPointF(rect().width(),0));
@@ -127,8 +130,11 @@ QVariant BlockItem::itemChange(GraphicsItemChange change, const QVariant & value
 
 		// snap to grid
 		QPointF pos = value.toPointF();
-		pos.setX( std::floor(pos.x() / Globals::GridSpacing) * Globals::GridSpacing);
-		pos.setY( std::floor(pos.y() / Globals::GridSpacing) * Globals::GridSpacing);
+		qDebug() << "Mouse pos " << pos;
+
+		// apply true rounding
+		pos.setX( std::floor((pos.x()+0.5*Globals::GridSpacing) / Globals::GridSpacing) * Globals::GridSpacing);
+		pos.setY( std::floor((pos.y()+0.5*Globals::GridSpacing) / Globals::GridSpacing) * Globals::GridSpacing);
 		if (m_block->m_pos != pos.toPoint()) {
 			m_moved = true;
 			m_block->m_pos = pos.toPoint();
@@ -147,6 +153,7 @@ QVariant BlockItem::itemChange(GraphicsItemChange change, const QVariant & value
 		{
 			scene()->setSceneRect( QRectF()); // tell scene to recompute scene rect
 		}
+		qDebug() << "Block moved to " << pos;
 		return pos;
 	}
 	return QGraphicsRectItem::itemChange(change, value);
