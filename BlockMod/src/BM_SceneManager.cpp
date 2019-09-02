@@ -422,13 +422,23 @@ void SceneManager::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 	if (m_connectionModeEnabled) {
 		if (!m_blockItems.isEmpty() && m_blockItems.back()->block()->m_name == Globals::InvisibleLabel) {
 			QPointF p = m_blockItems.back()->pos();
-			// search for sockets
 			for (BlockItem  * bi : m_blockItems) {
 				if (bi->block()->m_name == Globals::InvisibleLabel)
 					continue;
+				// first un-hover all sockets
+				for (SocketItem * si : bi->m_socketItems) {
+					si->m_hovered = false;
+					si->update();
+				}
+
+				// now search for sockets that may be hovered
 				SocketItem * si = bi->inletSocketAcceptingConnection(p);
 				if (si != nullptr) {
-					si->setHoverEnabled(true);
+					// only allow hovering for sockets without connection
+					if (!isConnectedSocket(bi->block(), si->socket())) {
+						si->m_hovered = true;
+						si->update();
+					}
 				}
 			}
 		}
@@ -473,11 +483,13 @@ QList<ConnectorSegmentItem *> SceneManager::createConnectorItems(Connector & con
 
 		ConnectorSegmentItem * item = new ConnectorSegmentItem(&con);
 		item->setLine(startLine);
+		item->setFlags(QGraphicsItem::ItemIsSelectable);
 		item->m_segmentIdx = -1; // start line
 		newConns.append(item);
 
 		item = new ConnectorSegmentItem(&con);
 		item->setLine(endLine);
+		item->setFlags(QGraphicsItem::ItemIsSelectable);
 		item->m_segmentIdx = -2; // end line
 		newConns.append(item);
 

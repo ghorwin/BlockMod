@@ -81,6 +81,8 @@ private:
 		Causes different pointing operation to be used.
 	*/
 	bool	m_hovered;
+
+	friend class SceneManager;
 };
 
 } // namespace BLOCKMOD

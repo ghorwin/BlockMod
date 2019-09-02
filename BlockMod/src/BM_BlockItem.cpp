@@ -65,11 +65,11 @@ SocketItem * BlockItem::inletSocketAcceptingConnection(const QPointF & scenePos)
 	for (SocketItem * si : m_socketItems) {
 		QPointF socketScenePos = si->mapToScene(si->socket()->m_pos);
 
-		QPointF socketScenePos2(socketScenePos);
+//		QPointF socketScenePos2(socketScenePos);
 		socketScenePos -= scenePos;
 		double d = socketScenePos.manhattanLength();
-		if (scenePos.manhattanLength() < Globals::GridSpacing/2) { // half grid spacing snapping tolerance
-			qDebug() << d << scenePos << socketScenePos2;
+		if (d < Globals::GridSpacing/2) { // half grid spacing snapping tolerance
+//			qDebug() << d << scenePos << socketScenePos2;
 			return si;
 		}
 	}
