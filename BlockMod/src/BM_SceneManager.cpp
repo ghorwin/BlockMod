@@ -327,6 +327,7 @@ void SceneManager::startSocketConnection(const SocketItem & outletSocketItem) {
 	// now create block item and connector items
 	BlockItem * bi = createBlockItem(m_network->m_blocks.back()); // Mind: always pass the object in the m_block list
 	m_blockItems.append(bi);
+
 	addItem(bi);
 
 	QList<ConnectorSegmentItem*> newConns = createConnectorItems(m_network->m_connectors.back());  // Mind: always pass the object in the m_connectors list
@@ -345,8 +346,9 @@ void SceneManager::startSocketConnection(const SocketItem & outletSocketItem) {
 			// only un-connected sockets, but that's tested-for in setHoverEnabled()
 			if (socketItem->socket()->m_inlet)
 				socketItem->setHoverEnabled(true);
+			else
+				socketItem->setHoverEnabled(false);
 		}
-		block->setFlags(QGraphicsItem::GraphicsItemFlag(0));
 	}
 
 }
@@ -407,28 +409,31 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 	bool inConnectionProcess = !m_network->m_blocks.empty() && (m_network->m_blocks.back().m_name == Globals::InvisibleLabel);
 	if (!alreadyInConnectionProcess && inConnectionProcess) {
 		// make the last item the mouse grabber objects
-//		m_blockItems.back()->grabMouse();
-		QGraphicsView* view = views()[0];
-		QPointF ptScene = mouseEvent->pos();
-		QPoint ptView = view->mapFromScene(ptScene);
-		QPoint ptGlobal = view->viewport()->mapToGlobal(ptView);
+		m_blockItems.back()->grabMouse();
+//		QGraphicsView* view = views()[0];
+//		QPointF ptScene = mouseEvent->pos();
+//		QPoint ptView = view->mapFromScene(ptScene);
+//		QPoint ptGlobal = view->viewport()->mapToGlobal(ptView);
 
-		QGraphicsSceneMouseEvent event2(QEvent::GraphicsSceneMousePress);
-		event2.setScenePos(ptScene);
-		event2.setPos(ptScene);
-		event2.setScreenPos(ptGlobal);
-		event2.setButton(Qt::LeftButton);
-		event2.setButtons(Qt::LeftButton);
-		event2.setModifiers(QApplication::keyboardModifiers());
+//		QGraphicsSceneMouseEvent event2(QEvent::GraphicsSceneMousePress);
+//		event2.setLastPos(mouseEvent->lastPos());
+//		event2.setLastScenePos(mouseEvent->lastScenePos());
+//		event2.setScenePos(ptScene);
+//		event2.setPos(ptScene);
+//		event2.setScreenPos(ptGlobal);
+//		event2.setButton(Qt::LeftButton);
+//		event2.setButtons(Qt::LeftButton);
+//		event2.setModifiers(QApplication::keyboardModifiers());
 
-		qApp->sendEvent(view, &event2);
+//		mouseEvent->setAccepted(false);
+//		qApp->sendEvent(this, mouseEvent);
 	}
 
 }
 
 
 void SceneManager::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
-	qDebug() << mouseEvent;
+//	qDebug() << mouseEvent;
 	QGraphicsScene::mouseMoveEvent(mouseEvent);
 }
 

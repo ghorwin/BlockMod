@@ -123,12 +123,7 @@ void BlockItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 
 QVariant BlockItem::itemChange(GraphicsItemChange change, const QVariant & value) {
 	if (change == QGraphicsItem::ItemPositionChange) {
-		qDebug() << "BlockItem move";
-		// check if scene is in connection mode, if yes, do nothing
 		SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
-		if (sceneManager) {
-			Q_ASSERT(!sceneManager->isConnectionModeEnabled());
-		}
 
 		// snap to grid
 		QPointF pos = value.toPointF();
@@ -138,7 +133,6 @@ QVariant BlockItem::itemChange(GraphicsItemChange change, const QVariant & value
 			m_moved = true;
 			m_block->m_pos = pos.toPoint();
 			// inform network to update connectors
-			SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
 			if (sceneManager != nullptr)
 				sceneManager->blockMoved(m_block);
 		}
