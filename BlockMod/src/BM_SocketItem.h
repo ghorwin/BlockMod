@@ -74,7 +74,12 @@ private:
 	/*! The bounding rectangle of the symbol (updated whenever content of the socket changes). */
 	QRectF	m_symbolRect;
 
+	/*! If enabled, the mouse hover event is captured and m_hovered flag is adjusted. */
 	bool	m_hoverEnabled;
+
+	/*! Set to true, when mouse hovers over item.
+		Causes different pointing operation to be used.
+	*/
 	bool	m_hovered;
 };
 

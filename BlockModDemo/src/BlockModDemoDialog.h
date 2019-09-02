@@ -25,6 +25,10 @@ private slots:
 
 	void on_toolButtonSave_clicked();
 
+	void on_pushButtonConnectSockets_clicked();
+
+	void on_pushButtonRemoveBlock_clicked();
+
 private:
 	void loadNetwork(const QString & fname);
 

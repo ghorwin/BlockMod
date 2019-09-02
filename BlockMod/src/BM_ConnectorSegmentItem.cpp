@@ -95,12 +95,16 @@ void ConnectorSegmentItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
 void ConnectorSegmentItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 	QGraphicsItem::hoverEnterEvent(event);
+	// check if scene is in connection mode, if yes, do nothing
+	SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+	if (sceneManager && sceneManager->isConnectionModeEnabled())
+		return;
+
 	if (line().dx() == 0.0)
 		QApplication::setOverrideCursor(Qt::SplitHCursor);
 	else
 		QApplication::setOverrideCursor(Qt::SplitVCursor);
 	// mark all connector segments in this line with a different color or bold
-	SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
 	if (sceneManager != nullptr)
 		sceneManager->highlightConnectorSegments(*m_connector, true);
 	QGraphicsLineItem::hoverEnterEvent(event);
@@ -109,9 +113,13 @@ void ConnectorSegmentItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 
 void ConnectorSegmentItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 	QGraphicsItem::hoverLeaveEvent(event);
+	// check if scene is in connection mode, if yes, do nothing
+	SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+	if (sceneManager && sceneManager->isConnectionModeEnabled())
+		return;
+
 	QApplication::setOverrideCursor(Qt::ArrowCursor);
 	// mark all connector segments in this line with a different color or bold
-	SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
 	if (sceneManager != nullptr)
 		sceneManager->highlightConnectorSegments(*m_connector, false);
 	QGraphicsLineItem::hoverLeaveEvent(event);

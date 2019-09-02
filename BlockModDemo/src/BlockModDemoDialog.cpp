@@ -8,6 +8,7 @@
 
 #include <BM_SceneManager.h>
 #include <BM_Network.h>
+#include <BM_BlockItem.h>
 
 BlockModDemoDialog::BlockModDemoDialog(QWidget *parent) :
 	QDialog(parent, Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint),
@@ -73,5 +74,32 @@ void BlockModDemoDialog::loadNetwork(const QString & fname) {
 	} catch (std::runtime_error & e) {
 		QString errormsg(e.what());
 		ui->plainTextEdit->appendPlainText(errormsg + '\n');
+	}
+}
+
+
+void BlockModDemoDialog::on_pushButtonConnectSockets_clicked() {
+	// put scene into connection mode by turning on outlet socket hovering
+	m_sceneManager->enableConnectionMode();
+	QApplication::setOverrideCursor(Qt::CrossCursor);
+}
+
+void BlockModDemoDialog::on_pushButtonRemoveBlock_clicked() {
+	// find out selected blocks
+
+	QList<QGraphicsItem*> selectedItems = m_sceneManager->selectedItems();
+	QList<BLOCKMOD::BlockItem *> selectedBlocks;
+	for (QGraphicsItem * item : selectedItems) {
+		BLOCKMOD::BlockItem * bi = dynamic_cast<BLOCKMOD::BlockItem *>(item);
+		if (bi != nullptr)
+			selectedBlocks.append(bi);
+	}
+
+	for (BLOCKMOD::BlockItem * bi : selectedBlocks) {
+		for (int idx = 0; idx < m_sceneManager->network().m_blocks.count(); ++idx) {
+			if (&m_sceneManager->network().m_blocks[idx] == bi->block()) {
+				m_sceneManager->removeBlock(idx);
+			}
+		}
 	}
 }

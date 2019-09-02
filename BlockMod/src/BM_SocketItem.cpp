@@ -39,6 +39,8 @@
 #include <QGraphicsScene>
 #include <QFontMetrics>
 #include <QDebug>
+#include <QGraphicsView>
+#include <QApplication>
 
 #include "BM_Socket.h"
 #include "BM_BlockItem.h"
@@ -80,8 +82,20 @@ QRectF SocketItem::boundingRect() const {
 
 
 void SocketItem::setHoverEnabled(bool enabled) {
-	m_hoverEnabled = enabled;
-	if (!enabled)
+	// for outlet sockets, hovering is only enabled if the socket is not already connected
+	if (enabled) {
+		if (!m_socket->m_inlet) {
+			SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+			BlockItem * blockItem = dynamic_cast<BlockItem*>(parentItem());
+			if (sceneManager && blockItem) {
+				if (!sceneManager->isConnectedSocket(blockItem->block(), socket()))
+					m_hoverEnabled = true;
+			}
+		}
+		else
+			m_hoverEnabled = true;
+	}
+	else
 		m_hovered = false;
 	update();
 }
@@ -246,15 +260,35 @@ void SocketItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
 void SocketItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 	// ignore clicks on inlet sockets
-	if (m_socket->m_inlet) {
+	if (!m_hoverEnabled) {
 		event->ignore();
 		return;
 	}
-	if (event->button() == Qt::LeftButton && event->modifiers() == Qt::NoModifier) {
-		SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
-		if (sceneManager) {
-			sceneManager->enterConnectMode(*this);
-			event->ignore(); // needed or fall through?
+	// starting a connection?
+	if (!m_socket->m_inlet) {
+		if (event->button() == Qt::LeftButton && event->modifiers() == Qt::NoModifier) {
+			SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+			if (sceneManager) {
+				sceneManager->startSocketConnection(*this);
+				event->accept(); // needed or fall through?
+
+				{
+					QGraphicsView* view = sceneManager->views()[0];
+					QPointF ptScene = event->pos();
+					QPoint ptView = view->mapFromScene(ptScene);
+					QPoint ptGlobal = view->viewport()->mapToGlobal(ptView);
+
+					QGraphicsSceneMouseEvent event2(QEvent::GraphicsSceneMousePress);
+					event2.setScenePos(ptScene);
+					event2.setPos(ptScene);
+					event2.setScreenPos(ptGlobal);
+					event2.setButton(Qt::LeftButton);
+					event2.setButtons(Qt::LeftButton);
+					event2.setModifiers(QApplication::keyboardModifiers());
+
+					qApp->sendEvent(sceneManager, &event2);
+				}
+			}
 		}
 	}
 }

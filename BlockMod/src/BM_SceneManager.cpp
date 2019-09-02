@@ -37,6 +37,7 @@
 #include <QGraphicsPolygonItem>
 #include <QDebug>
 #include <QApplication>
+#include <QGraphicsSceneMouseEvent>
 
 #include <iostream>
 
@@ -50,7 +51,9 @@
 namespace BLOCKMOD {
 
 SceneManager::SceneManager(QObject *parent) :
-	QGraphicsScene(parent), m_network(new Network)
+	QGraphicsScene(parent),
+	m_network(new Network),
+	m_connectionModeEnabled(false)
 {
 	// set render hints
 }
@@ -235,9 +238,56 @@ bool SceneManager::isConnectedSocket(const Block * b, const Socket * s) const {
 }
 
 
-void SceneManager::enterConnectMode(const SocketItem & outletSocketItem) {
+void SceneManager::enableConnectionMode() {
+	for (BLOCKMOD::BlockItem * block : m_blockItems) {
+		for (QGraphicsItem * item : block->childItems()) {
+			BLOCKMOD::SocketItem * socketItem = dynamic_cast<BLOCKMOD::SocketItem*>(item);
+			Q_ASSERT(socketItem != nullptr);
+
+			if (!socketItem->socket()->m_inlet)
+				socketItem->setEnabled(true);
+		}
+		block->setFlags(QGraphicsItem::GraphicsItemFlag(0));
+	}
+	for (BLOCKMOD::ConnectorSegmentItem * segmentItem : m_connectorSegmentItems) {
+		segmentItem->setFlags(QGraphicsItem::GraphicsItemFlag(0));
+	}
+	m_connectionModeEnabled = true;
+}
+
+
+void SceneManager::disableConnectionMode() {
+	for (BLOCKMOD::BlockItem * block : m_blockItems) {
+		for (QGraphicsItem * item : block->childItems()) {
+			BLOCKMOD::SocketItem * socketItem = dynamic_cast<BLOCKMOD::SocketItem*>(item);
+			Q_ASSERT(socketItem != nullptr);
+
+			socketItem->setEnabled(false);
+		}
+		block->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
+	}
+	for (BLOCKMOD::ConnectorSegmentItem * segmentItem : m_connectorSegmentItems) {
+		if (segmentItem->m_segmentIdx >= 0)
+			segmentItem->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
+	}
+
+	// remove our artifical block and block item, if it exists
+	if (!m_network->m_blocks.isEmpty() && m_network->m_blocks.back().m_name  == Globals::InvisibleLabel)
+		removeBlock(m_network->m_blocks.count()-1);
+
+	// remove our artifical connectors
+
+
+	m_connectionModeEnabled = false;
+}
+
+
+void SceneManager::startSocketConnection(const SocketItem & outletSocketItem) {
 	Q_ASSERT(!outletSocketItem.socket()->m_inlet);
 	// TODO : add flag to enable/disable connect mode
+
+	// process all existing socket items and toggle the m_hoverEnabled flag for inlets and outlets
+
 
 	// determine block that this outlet socket item belongs to
 	BlockItem * bitem = dynamic_cast<BlockItem *>(outletSocketItem.parentItem());
@@ -287,12 +337,55 @@ void SceneManager::enterConnectMode(const SocketItem & outletSocketItem) {
 }
 
 
-void SceneManager::leaveConnectMode(const BlockItem & connectionBlock) {
+
+void SceneManager::removeBlock(int blockIndex) {
+	Q_ASSERT(m_network->m_blocks.count() > blockIndex);
+	Q_ASSERT(m_blockItems.count() > blockIndex);
+
+	Block * blockToBeRemoved = &m_network->m_blocks[blockIndex];
+
+	// find connectors that connect to this block
+	QSet<Connector*> connectors = m_blockConnectorMap[blockToBeRemoved];
+	for (Connector * con : connectors) {
+		// get index of connector
+		int i=0;
+		while (i < m_network->m_connectors.count()) {
+			if (&m_network->m_connectors[i] == con) {
+				m_network->m_connectors.removeAt(i);
+				continue;
+			}
+			++i;
+		}
+	}
+
+	// now remove the block itself
+	BlockItem * bi = m_blockItems[blockIndex];
+	m_blockItems.removeAt(blockIndex);
+	delete bi;
+
+	m_network->m_blocks.removeAt(blockIndex);
+
+	// and update all connector items; first remove all, then recreate as needed
+	qDeleteAll(m_connectorSegmentItems); // will be recreated
+	m_connectorSegmentItems.clear();
+	m_blockConnectorMap.clear(); // will be recreated
+	for (Connector & con : m_network->m_connectors) {
+		updateConnectorSegmentItems(con, nullptr);
+	}
 
 }
 
 
+
 // ** protected functions **
+
+void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+	if (mouseEvent->button() == Qt::RightButton) {
+		disableConnectionMode();
+	}
+	QGraphicsScene::mousePressEvent(mouseEvent);
+}
+
 
 BlockItem * SceneManager::createBlockItem(Block & b) {
 	BlockItem * item = new BlockItem(&b);

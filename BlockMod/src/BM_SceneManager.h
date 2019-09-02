@@ -66,6 +66,9 @@ public:
 	/*! Provide read-only access to the network data structure. */
 	const Network & network() const;
 
+
+	// Functions called from blocks/items to adjust the network due to user interaction
+
 	/*! Called from BlockItem when a block was moved to signal the scene manager
 		to adjust the connected connectors.
 	*/
@@ -92,6 +95,21 @@ public:
 	/*! Quick test if a socket is connected anywhere by a connector. */
 	bool isConnectedSocket(const Block * b, const Socket * s) const;
 
+
+	// Functions related to connection mode
+
+	/*! Puts the scene into connection mode.
+		This turns on the hover-effect on outlet sockets which now start a connection upon click.
+		Also, block and connector movement is disabled.
+	*/
+	void enableConnectionMode();
+
+	/*! Turns of the connection mode. */
+	void disableConnectionMode();
+
+	/*! Returns true, if scene is currently in connection mode. */
+	bool isConnectionModeEnabled() const { return m_connectionModeEnabled; }
+
 	/*! Called from a socket item, so that the scene is put into connection mode.
 		This means:
 		- a virtual (invisible) block is created with a single inlet connector, the start line
@@ -100,11 +118,22 @@ public:
 		- all unconnected inlet sockets are marked as highlightable
 		- all outlet sockets are marked as not highlightable
 	*/
-	void enterConnectMode(const SocketItem & outletSocketItem);
+	void startSocketConnection(const SocketItem & outletSocketItem);
 
-	void leaveConnectMode(const BlockItem & connectionBlock);
+
+	// functions to modify managed network
+
+	/*! Removes the block at the given index in the network's block list.
+		Index must be a valid, otherwise an exception is raised.
+		Also removes any connections made to this block.
+	*/
+	void removeBlock(int blockIndex);
+
 
 protected:
+
+	/*! Listens for right-mouse-button clicks that turn off connection mode. */
+	virtual void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
 	/*! Create a graphics item based on the data in the given block.
 		You can override this method and create your own graphics items, derived from
@@ -117,6 +146,7 @@ protected:
 		base class ConnectorSegmentItem (which contains all the move/selection logic).
 	*/
 	virtual QList<ConnectorSegmentItem *> createConnectorItems(Connector & con);
+
 
 private:
 	/*! Looks up all segment items belonging to this connector and updates
@@ -144,6 +174,9 @@ private:
 		made/removed.
 	*/
 	QMap<const Block*, QSet<Connector*> >	m_blockConnectorMap;
+
+	/*! If true, the scene is in connection mode and dragging of connectors/blocks is disabled. */
+	bool							m_connectionModeEnabled;
 
 };
 

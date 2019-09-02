@@ -72,7 +72,6 @@ void BlockItem::createSocketItems() {
 		SocketItem * item = new SocketItem(this, &s);
 		// enable hover-highlight on outlet nodes
 		if (!s.m_inlet) {
-			item->setHoverEnabled(true);
 			item->setZValue(20); // outlet nodes are drawn over lines
 		}
 		m_socketItems.append(item);
@@ -123,6 +122,12 @@ void BlockItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 
 QVariant BlockItem::itemChange(GraphicsItemChange change, const QVariant & value) {
 	if (change == QGraphicsItem::ItemPositionChange) {
+		// check if scene is in connection mode, if yes, do nothing
+		SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+		if (sceneManager) {
+			Q_ASSERT(!sceneManager->isConnectionModeEnabled());
+		}
+
 		// snap to grid
 		QPointF pos = value.toPointF();
 		pos.setX( std::floor(pos.x() / Globals::GridSpacing) * Globals::GridSpacing);
