@@ -34,6 +34,7 @@
 #include "BM_BlockItem.h"
 
 #include <cmath>
+#include <iostream>
 
 #include <QPainter>
 #include <QLinearGradient>
@@ -57,6 +58,22 @@ BlockItem::BlockItem(Block * b) :
 	setZValue(10);
 
 	createSocketItems();
+}
+
+
+SocketItem * BlockItem::inletSocketAcceptingConnection(const QPointF & scenePos) {
+	for (SocketItem * si : m_socketItems) {
+		QPointF socketScenePos = si->mapToScene(si->socket()->m_pos);
+
+		QPointF socketScenePos2(socketScenePos);
+		socketScenePos -= scenePos;
+		double d = socketScenePos.manhattanLength();
+		if (scenePos.manhattanLength() < Globals::GridSpacing/2) { // half grid spacing snapping tolerance
+			qDebug() << d << scenePos << socketScenePos2;
+			return si;
+		}
+	}
+	return nullptr;
 }
 
 
@@ -130,7 +147,6 @@ QVariant BlockItem::itemChange(GraphicsItemChange change, const QVariant & value
 
 		// snap to grid
 		QPointF pos = value.toPointF();
-		qDebug() << "Mouse pos " << pos;
 
 		// apply true rounding
 		pos.setX( std::floor((pos.x()+0.5*Globals::GridSpacing) / Globals::GridSpacing) * Globals::GridSpacing);
@@ -153,7 +169,6 @@ QVariant BlockItem::itemChange(GraphicsItemChange change, const QVariant & value
 		{
 			scene()->setSceneRect( QRectF()); // tell scene to recompute scene rect
 		}
-		qDebug() << "Block moved to " << pos;
 		return pos;
 	}
 	return QGraphicsRectItem::itemChange(change, value);

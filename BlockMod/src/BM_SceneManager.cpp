@@ -328,7 +328,6 @@ void SceneManager::startSocketConnection(const SocketItem & outletSocketItem, co
 	BlockItem * bi = createBlockItem(m_network->m_blocks.back()); // Mind: always pass the object in the m_block list
 	bi->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
 	bi->setPos(dummyBlock.m_pos);
-	bi->grabMouse();
 	m_blockItems.append(bi);
 
 	bi->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
@@ -342,23 +341,16 @@ void SceneManager::startSocketConnection(const SocketItem & outletSocketItem, co
 		m_connectorSegmentItems.append(item);
 	}
 
-	// toggle hovering effect to be used only for inlets
+	// turn off hovering for all sockets
+	// Mind: while mouse button is pressed, hover events are not send
 	for (BLOCKMOD::BlockItem * block : m_blockItems) {
 		for (QGraphicsItem * item : block->childItems()) {
 			BLOCKMOD::SocketItem * socketItem = dynamic_cast<BLOCKMOD::SocketItem*>(item);
 			Q_ASSERT(socketItem != nullptr);
-
-			// we expect users to release on an inlet, so only inlets use hovering (actually,
-			// only un-connected sockets, but that's tested-for in setHoverEnabled()
-			if (socketItem->socket()->m_inlet)
-				socketItem->setHoverEnabled(true);
-			else
-				socketItem->setHoverEnabled(false);
+			socketItem->setHoverEnabled(false);
 		}
 	}
-
 }
-
 
 
 void SceneManager::removeBlock(int blockIndex) {
@@ -423,6 +415,25 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 
 void SceneManager::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 //	qDebug() << mouseEvent;
+
+	// check if in connection mode and if connection-block position is over an inlet socket that
+	// is not yet connected - if so, mark the socket as "hovered" and update it
+
+	if (m_connectionModeEnabled) {
+		if (!m_blockItems.isEmpty() && m_blockItems.back()->block()->m_name == Globals::InvisibleLabel) {
+			QPointF p = m_blockItems.back()->pos();
+			// search for sockets
+			for (BlockItem  * bi : m_blockItems) {
+				if (bi->block()->m_name == Globals::InvisibleLabel)
+					continue;
+				SocketItem * si = bi->inletSocketAcceptingConnection(p);
+				if (si != nullptr) {
+					si->setHoverEnabled(true);
+				}
+			}
+		}
+	}
+
 	QGraphicsScene::mouseMoveEvent(mouseEvent);
 }
 

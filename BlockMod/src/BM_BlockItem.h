@@ -51,6 +51,11 @@ public:
 
 	const Block * block() const { return m_block; }
 
+	/*! Searches for a socket item at the given scene position and returns a pointer to it, if
+		it is not yet connected.
+	*/
+	SocketItem * inletSocketAcceptingConnection(const QPointF & scenePos);
+
 protected:
 	/*! This function is called from the constructor and creates child socket items. */
 	virtual void createSocketItems();

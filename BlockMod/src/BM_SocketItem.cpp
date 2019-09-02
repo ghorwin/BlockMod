@@ -83,20 +83,8 @@ QRectF SocketItem::boundingRect() const {
 
 
 void SocketItem::setHoverEnabled(bool enabled) {
-	// for outlet sockets, hovering is only enabled if the socket is not already connected
 	if (enabled) {
-		// inlet socket can only receive one input signal, so hovering will only be permitted
-		// if they are not yet connected to
-		if (m_socket->m_inlet) {
-			SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
-			BlockItem * blockItem = dynamic_cast<BlockItem*>(parentItem());
-			if (sceneManager && blockItem) {
-				if (!sceneManager->isConnectedSocket(blockItem->block(), socket()))
-					m_hoverEnabled = true;
-			}
-		}
-		else
-			m_hoverEnabled = true; // outlet sockets can be connected-to several times
+		m_hoverEnabled = true;
 	}
 	else {
 		m_hoverEnabled = false;
@@ -185,7 +173,7 @@ void SocketItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 			QPen p(QColor(192,0,0), 0.8);
 			painter->setPen(p);
 			painter->setBrush(QBrush(QColor(96,0,0)));
-			QRectF r2(r.x()+0.5, r.y()+0.5, r.width() - 1, r.height() - 1);
+			QRectF r2(r.x()-0.5, r.y()-0.5, r.width() + 1, r.height() + 1);
 			painter->drawEllipse(r2);
 			painter->restore();
 		}
