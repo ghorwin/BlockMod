@@ -63,7 +63,12 @@ void ConnectorSegmentItem::setLine(const QLineF &line) {
 }
 
 
-void ConnectorSegmentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void ConnectorSegmentItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/) {
+	// don't draw zero length lines (appear before merge during draggging or while in connection mode)
+	QLineF l = line();
+	if (Globals::nearZero(l.length()))
+		return;
+
 	painter->save();
 	if (m_isHighlighted) {
 		QPen p;
@@ -74,7 +79,6 @@ void ConnectorSegmentItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 			p.setStyle(Qt::DashLine);
 		}
 		painter->setPen(p);
-		QLineF l = line();
 		painter->drawLine(l);
 	}
 	else {

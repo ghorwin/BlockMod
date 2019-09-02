@@ -173,7 +173,7 @@ void SocketItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 			QPen p(QColor(192,0,0), 0.8);
 			painter->setPen(p);
 			painter->setBrush(QBrush(QColor(96,0,0)));
-			QRectF r2(r.x()-0.5, r.y()-0.5, r.width() + 1, r.height() + 1);
+			QRectF r2(r.x()-1, r.y()-1, r.width() + 2, r.height() + 2);
 			painter->drawEllipse(r2);
 			painter->restore();
 		}
