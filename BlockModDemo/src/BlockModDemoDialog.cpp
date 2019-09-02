@@ -81,7 +81,6 @@ void BlockModDemoDialog::loadNetwork(const QString & fname) {
 void BlockModDemoDialog::on_pushButtonConnectSockets_clicked() {
 	// put scene into connection mode by turning on outlet socket hovering
 	m_sceneManager->enableConnectionMode();
-	QApplication::setOverrideCursor(Qt::CrossCursor);
 }
 
 void BlockModDemoDialog::on_pushButtonRemoveBlock_clicked() {

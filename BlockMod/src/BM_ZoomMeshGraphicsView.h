@@ -87,14 +87,20 @@ public slots:
 	void setResolution(double res);
 
 protected:
+	/*! Overloaded to set cross/arrow cursor, depending on connection-mode state of scene. */
+	void enterEvent(QEvent *event) override;
+
+	/*! Overloaded to set arrow cursor. */
+	void leaveEvent(QEvent *event) override;
+
 	/*! set the zoom center. */
-	void mouseMoveEvent(QMouseEvent *event);
+	void mouseMoveEvent(QMouseEvent *event) override;
 
 	/*! Enables the zoom. */
-	void wheelEvent(QWheelEvent *i_event);
+	void wheelEvent(QWheelEvent *i_event) override;
 
 	/*! Draws the mesh. */
-	void paintEvent(QPaintEvent *i_event);
+	void paintEvent(QPaintEvent *i_event) override;
 
 	/*! This event is called from this class and can be used in derived classes to
 		react on changes to the zoom factor. */

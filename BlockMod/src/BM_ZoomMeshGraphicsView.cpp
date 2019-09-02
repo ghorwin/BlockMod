@@ -37,7 +37,11 @@
 #include <QList>
 #include <QGraphicsItem>
 #include <QDebug>
+#include <QApplication>
+
 #include <cmath>
+
+#include "BM_SceneManager.h"
 
 namespace BLOCKMOD {
 
@@ -172,6 +176,26 @@ void ZoomMeshGraphicsView::paintEvent(QPaintEvent *i_event){
 	}
 
 	QGraphicsView::paintEvent(i_event);
+}
+
+
+void ZoomMeshGraphicsView::enterEvent(QEvent *event) {
+	Q_ASSERT(event->type() == QEvent::Enter);
+
+	SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+	if (sceneManager) {
+		if (sceneManager->isConnectionModeEnabled())
+			QApplication::setOverrideCursor(Qt::CrossCursor);
+		else
+			QApplication::setOverrideCursor(Qt::ArrowCursor);
+	}
+	QGraphicsView::enterEvent(event);
+}
+
+
+void ZoomMeshGraphicsView::leaveEvent(QEvent *event) {
+	QApplication::setOverrideCursor(Qt::ArrowCursor);
+	QGraphicsView::leaveEvent(event);
 }
 
 

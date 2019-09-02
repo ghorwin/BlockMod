@@ -253,6 +253,7 @@ void SceneManager::enableConnectionMode() {
 		segmentItem->setFlags(QGraphicsItem::GraphicsItemFlag(0));
 	}
 	m_connectionModeEnabled = true;
+	QApplication::setOverrideCursor(Qt::CrossCursor);
 }
 
 
@@ -275,10 +276,8 @@ void SceneManager::disableConnectionMode() {
 	if (!m_network->m_blocks.isEmpty() && m_network->m_blocks.back().m_name  == Globals::InvisibleLabel)
 		removeBlock(m_network->m_blocks.count()-1);
 
-	// remove our artifical connectors
-
-
 	m_connectionModeEnabled = false;
+	QApplication::setOverrideCursor(Qt::ArrowCursor);
 }
 
 

@@ -84,7 +84,9 @@ QRectF SocketItem::boundingRect() const {
 void SocketItem::setHoverEnabled(bool enabled) {
 	// for outlet sockets, hovering is only enabled if the socket is not already connected
 	if (enabled) {
-		if (!m_socket->m_inlet) {
+		// inlet socket can only receive one input signal, so hovering will only be permitted
+		// if they are not yet connected to
+		if (m_socket->m_inlet) {
 			SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
 			BlockItem * blockItem = dynamic_cast<BlockItem*>(parentItem());
 			if (sceneManager && blockItem) {
@@ -93,7 +95,7 @@ void SocketItem::setHoverEnabled(bool enabled) {
 			}
 		}
 		else
-			m_hoverEnabled = true;
+			m_hoverEnabled = true; // outlet sockets can be connected-to several times
 	}
 	else
 		m_hovered = false;
