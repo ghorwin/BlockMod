@@ -212,7 +212,7 @@ void ZoomMeshGraphicsView::setGridColor( QColor color ) {
 }
 
 
-void ZoomMeshGraphicsView::setGridEnabled( bool enabled ){
+void ZoomMeshGraphicsView::setGridEnabled( bool enabled ) {
 	m_gridEnabled = enabled;
 	viewport()->update();
 }

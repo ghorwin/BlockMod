@@ -40,6 +40,7 @@
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsScene>
+#include <QDebug>
 
 #include "BM_Block.h"
 #include "BM_Globals.h"
@@ -122,6 +123,7 @@ void BlockItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 
 QVariant BlockItem::itemChange(GraphicsItemChange change, const QVariant & value) {
 	if (change == QGraphicsItem::ItemPositionChange) {
+		qDebug() << "BlockItem move";
 		// check if scene is in connection mode, if yes, do nothing
 		SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
 		if (sceneManager) {

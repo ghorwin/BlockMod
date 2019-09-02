@@ -133,7 +133,15 @@ public:
 protected:
 
 	/*! Listens for right-mouse-button clicks that turn off connection mode. */
-	virtual void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
+	virtual void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
+
+	/*! When mouse is released, check if we are hovering over an inlet socket. If yet, make a new connection, otherwise
+		just leave connection mode.
+	*/
+	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
+
+	/*! Listens for right-mouse-button clicks that turn off connection mode. */
+	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
 
 	/*! Create a graphics item based on the data in the given block.
 		You can override this method and create your own graphics items, derived from

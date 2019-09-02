@@ -97,14 +97,17 @@ void SocketItem::setHoverEnabled(bool enabled) {
 		else
 			m_hoverEnabled = true; // outlet sockets can be connected-to several times
 	}
-	else
+	else {
+		m_hoverEnabled = false;
 		m_hovered = false;
+	}
 	update();
 }
 
 // *** protected functions ***
 
 void SocketItem::hoverEnterEvent (QGraphicsSceneHoverEvent *event) {
+	qDebug() << "Hoverevent";
 	if (m_hoverEnabled)
 		m_hovered = true;
 	QGraphicsItem::hoverEnterEvent(event);
@@ -273,26 +276,10 @@ void SocketItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 			if (sceneManager) {
 				sceneManager->startSocketConnection(*this);
 				event->accept(); // needed or fall through?
-
-				{
-					QGraphicsView* view = sceneManager->views()[0];
-					QPointF ptScene = event->pos();
-					QPoint ptView = view->mapFromScene(ptScene);
-					QPoint ptGlobal = view->viewport()->mapToGlobal(ptView);
-
-					QGraphicsSceneMouseEvent event2(QEvent::GraphicsSceneMousePress);
-					event2.setScenePos(ptScene);
-					event2.setPos(ptScene);
-					event2.setScreenPos(ptGlobal);
-					event2.setButton(Qt::LeftButton);
-					event2.setButtons(Qt::LeftButton);
-					event2.setModifiers(QApplication::keyboardModifiers());
-
-					qApp->sendEvent(sceneManager, &event2);
-				}
 			}
 		}
 	}
+
 }
 
 

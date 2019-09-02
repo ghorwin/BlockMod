@@ -35,6 +35,7 @@
 
 #include <QGraphicsItem>
 #include <QGraphicsPolygonItem>
+#include <QGraphicsView>
 #include <QDebug>
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
@@ -244,8 +245,9 @@ void SceneManager::enableConnectionMode() {
 			BLOCKMOD::SocketItem * socketItem = dynamic_cast<BLOCKMOD::SocketItem*>(item);
 			Q_ASSERT(socketItem != nullptr);
 
+			// we expect users to click on an outlet, so only outlets use hovering
 			if (!socketItem->socket()->m_inlet)
-				socketItem->setEnabled(true);
+				socketItem->setHoverEnabled(true);
 		}
 		block->setFlags(QGraphicsItem::GraphicsItemFlag(0));
 	}
@@ -263,7 +265,7 @@ void SceneManager::disableConnectionMode() {
 			BLOCKMOD::SocketItem * socketItem = dynamic_cast<BLOCKMOD::SocketItem*>(item);
 			Q_ASSERT(socketItem != nullptr);
 
-			socketItem->setEnabled(false);
+			socketItem->setHoverEnabled(false);
 		}
 		block->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsGeometryChanges);
 	}
@@ -333,6 +335,20 @@ void SceneManager::startSocketConnection(const SocketItem & outletSocketItem) {
 		m_connectorSegmentItems.append(item);
 	}
 
+	// toggle hovering effect to be used only for inlets
+	for (BLOCKMOD::BlockItem * block : m_blockItems) {
+		for (QGraphicsItem * item : block->childItems()) {
+			BLOCKMOD::SocketItem * socketItem = dynamic_cast<BLOCKMOD::SocketItem*>(item);
+			Q_ASSERT(socketItem != nullptr);
+
+			// we expect users to release on an inlet, so only inlets use hovering (actually,
+			// only un-connected sockets, but that's tested-for in setHoverEnabled()
+			if (socketItem->socket()->m_inlet)
+				socketItem->setHoverEnabled(true);
+		}
+		block->setFlags(QGraphicsItem::GraphicsItemFlag(0));
+	}
+
 }
 
 
@@ -382,7 +398,46 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 	if (mouseEvent->button() == Qt::RightButton) {
 		disableConnectionMode();
 	}
+	// in case of click on socket while in connection mode, the next call will
+	// result in a call to startSocketConnection(), which creates a new block and connection
+	// we need to detect this and fire a mouse event again afterwards, which will cause
+	// the newly created block to go into drag-move mode
+	bool alreadyInConnectionProcess = !m_network->m_blocks.empty() && (m_network->m_blocks.back().m_name == Globals::InvisibleLabel);
 	QGraphicsScene::mousePressEvent(mouseEvent);
+	bool inConnectionProcess = !m_network->m_blocks.empty() && (m_network->m_blocks.back().m_name == Globals::InvisibleLabel);
+	if (!alreadyInConnectionProcess && inConnectionProcess) {
+		// make the last item the mouse grabber objects
+//		m_blockItems.back()->grabMouse();
+		QGraphicsView* view = views()[0];
+		QPointF ptScene = mouseEvent->pos();
+		QPoint ptView = view->mapFromScene(ptScene);
+		QPoint ptGlobal = view->viewport()->mapToGlobal(ptView);
+
+		QGraphicsSceneMouseEvent event2(QEvent::GraphicsSceneMousePress);
+		event2.setScenePos(ptScene);
+		event2.setPos(ptScene);
+		event2.setScreenPos(ptGlobal);
+		event2.setButton(Qt::LeftButton);
+		event2.setButtons(Qt::LeftButton);
+		event2.setModifiers(QApplication::keyboardModifiers());
+
+		qApp->sendEvent(view, &event2);
+	}
+
+}
+
+
+void SceneManager::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+	qDebug() << mouseEvent;
+	QGraphicsScene::mouseMoveEvent(mouseEvent);
+}
+
+
+void SceneManager::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+	QGraphicsScene::mouseReleaseEvent(mouseEvent);
+	if (mouseEvent->button() & Qt::LeftButton) {
+		disableConnectionMode();
+	}
 }
 
 
@@ -466,7 +521,16 @@ void SceneManager::updateConnectorSegmentItems(const Connector & con, ConnectorS
 			}
 		}
 	}
-	// sanity checks
+	// re-create entire connector if all pointers are emtpy
+	if (startSegment == nullptr && endSegment == nullptr && segmentItems.isEmpty()) {
+		QList<ConnectorSegmentItem *> newConns = createConnectorItems(const_cast<Connector&>(con)); // const-cast is safe here, since we only expect connector objects that we own ourselves
+		for( BLOCKMOD::ConnectorSegmentItem * item : newConns) {
+			addItem(item);
+			m_connectorSegmentItems.append(item);
+//			qDebug() << item << " : " << item->m_connector << " : " << item->m_segmentIdx << " : " << item->line();
+		}
+		return;
+	}
 	Q_ASSERT(startSegment != nullptr);
 	Q_ASSERT(endSegment != nullptr);
 	// segmentItems now contains all segment items matching this connected, except the currentItem
