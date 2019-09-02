@@ -109,9 +109,7 @@ void SocketItem::hoverLeaveEvent (QGraphicsSceneHoverEvent *event) {
 }
 
 
-void SocketItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-			QWidget * /*widget*/ )
-{
+void SocketItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/ ) {
 	// special handling for invisible blocks
 	BlockItem * bi = dynamic_cast<BlockItem*>(parentItem());
 	if (bi->block()->m_name == Globals::InvisibleLabel)
@@ -271,13 +269,11 @@ void SocketItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 			if (sceneManager) {
 				QPointF p = event->pos(); // this is the position of the socket relative to the parent block
 				p = mapToScene(p); // this is the global scene coordinate
-				qDebug() << "Mouse click at " << p;
 				sceneManager->startSocketConnection(*this, p);
 				event->accept(); // needed or fall through?
 			}
 		}
 	}
-
 }
 
 

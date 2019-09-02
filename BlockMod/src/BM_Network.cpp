@@ -186,14 +186,7 @@ void Network::adjustConnectors() {
 
 
 void Network::adjustConnector(Connector & con) {
-	// split at first . and extract block name
-//	QString sourceBlock, sourceSocket;
-//	QString targetBlock, targetSocket;
-//	splitFlatName(con.m_sourceSocket, sourceBlock, sourceSocket);
-//	splitFlatName(con.m_targetSocket, targetBlock, targetSocket);
-	// retrieve block data structures
-//	const Block & sourceBlock = blockByName(sourceBlock);
-//	const Block & targetBlock = blockByName(sourceBlock);
+	// split socket name into block and socket
 	const Socket * socket;
 	const Block * block;
 	lookupBlockAndSocket(con.m_sourceSocket, block, socket);
@@ -216,23 +209,6 @@ void Network::adjustConnector(Connector & con) {
 	}
 
 	// remaining distance must be distributed to segments
-	if (!Globals::nearZero(dx)) {
-		// now search for first connector segment that is horizontal
-		int i;
-		for (i=0;i<con.m_segments.count(); ++i) {
-			if (con.m_segments[i].m_direction == Qt::Horizontal) {
-				con.m_segments[i].m_offset += dx;
-				break;
-			}
-		}
-		if (i == con.m_segments.count()) {
-			// add a new segment with proper size
-			Connector::Segment s;
-			s.m_direction = Qt::Horizontal;
-			s.m_offset = dx;
-			con.m_segments.append(s);
-		}
-	}
 	if (!Globals::nearZero(dy)) {
 		// now search for first connector segment that is vertical
 		int i;
@@ -247,6 +223,23 @@ void Network::adjustConnector(Connector & con) {
 			Connector::Segment s;
 			s.m_direction = Qt::Vertical;
 			s.m_offset = dy;
+			con.m_segments.append(s);
+		}
+	}
+	if (!Globals::nearZero(dx)) {
+		// now search for first connector segment that is horizontal
+		int i;
+		for (i=0;i<con.m_segments.count(); ++i) {
+			if (con.m_segments[i].m_direction == Qt::Horizontal) {
+				con.m_segments[i].m_offset += dx;
+				break;
+			}
+		}
+		if (i == con.m_segments.count()) {
+			// add a new segment with proper size
+			Connector::Segment s;
+			s.m_direction = Qt::Horizontal;
+			s.m_offset = dx;
 			con.m_segments.append(s);
 		}
 	}

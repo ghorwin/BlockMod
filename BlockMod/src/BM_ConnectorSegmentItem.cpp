@@ -86,6 +86,7 @@ void ConnectorSegmentItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 		p.setWidthF(1);
 		p.setColor(Qt::black);
 		if (isSelected()) {
+			p.setWidthF(2);
 			p.setColor(QColor(192,0,0));
 			p.setStyle(Qt::DashLine);
 		}
@@ -132,24 +133,41 @@ void ConnectorSegmentItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 }
 
 
+void ConnectorSegmentItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+	SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+	if (sceneManager != nullptr)
+		sceneManager->clearSelection();
+	setSelected(true);
+	QGraphicsLineItem::mousePressEvent(event);
+}
+
+
 void ConnectorSegmentItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 	if (event->button() == Qt::LeftButton && event->modifiers().testFlag(Qt::ControlModifier)) {
 		setSelected(true);
 		event->accept();
+		SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+		if (sceneManager != nullptr)
+			sceneManager->onSelectionChanged();
 		return;
 	}
 	if (event->button() == Qt::LeftButton && !m_moved) {
 		QGraphicsLineItem::mouseReleaseEvent(event);
 		setSelected(true);
 		event->accept();
+		SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+		if (sceneManager != nullptr)
+			sceneManager->onSelectionChanged();
 		update();
 		return;
 	}
 	QGraphicsLineItem::mouseReleaseEvent(event);
 	m_moved = false;
 	SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
-	if (sceneManager != nullptr)
+	if (sceneManager != nullptr) {
 		sceneManager->mergeConnectorSegments(*m_connector);
+		sceneManager->onSelectionChanged();
+	}
 }
 
 

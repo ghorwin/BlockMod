@@ -56,7 +56,8 @@ SceneManager::SceneManager(QObject *parent) :
 	m_network(new Network),
 	m_connectionModeEnabled(false)
 {
-	// set render hints
+	// listen for selection changes
+//	connect(this, &SceneManager::selectionChanged, this, &SceneManager::onSelectionChanged);
 }
 
 
@@ -120,6 +121,18 @@ void SceneManager::highlightConnectorSegments(const Connector & con, bool highli
 	for (ConnectorSegmentItem* segmentItem : m_connectorSegmentItems) {
 		if (segmentItem->m_connector == &con) {
 			segmentItem->m_isHighlighted = highlighted;
+			segmentItem->update();
+		}
+	}
+	this->update();
+}
+
+
+void SceneManager::selectConnectorSegments(const Connector & con) {
+	for (ConnectorSegmentItem* segmentItem : m_connectorSegmentItems) {
+		if (segmentItem->m_connector == &con) {
+			if (!segmentItem->isSelected())
+				segmentItem->setSelected(true);
 			segmentItem->update();
 		}
 	}
@@ -449,9 +462,47 @@ void SceneManager::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 
 
 void SceneManager::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+
 	QGraphicsScene::mouseReleaseEvent(mouseEvent);
 	if (mouseEvent->button() & Qt::LeftButton) {
+		QString startSocket;
+		QString targetSocket;
+
+		// check if we have dropped onto a connectable socket
+		if (m_connectionModeEnabled) {
+			if (!m_blockItems.isEmpty() && m_blockItems.back()->block()->m_name == Globals::InvisibleLabel) {
+				QPointF p = m_blockItems.back()->pos();
+				for (BlockItem  * bi : m_blockItems) {
+					if (bi->block()->m_name == Globals::InvisibleLabel)
+						continue;
+
+					// now search for sockets that may be hovered
+					SocketItem * si = bi->inletSocketAcceptingConnection(p);
+					if (si != nullptr) {
+						// only allow hovering for sockets without connection
+						if (!isConnectedSocket(bi->block(), si->socket())) {
+							// found one - remember this socket and the starting socket for our connection
+							startSocket = m_network->m_connectors.back().m_sourceSocket;
+							targetSocket = bi->block()->m_name + "." + si->socket()->m_name;
+							break;
+						}
+					}
+				}
+			}
+		}
+
 		disableConnectionMode();
+
+		// now create a new connector
+		if (!startSocket.isEmpty() && !targetSocket.isEmpty()) {
+			Connector con;
+			con.m_name = "new connector";
+			con.m_sourceSocket = startSocket;
+			con.m_targetSocket = targetSocket;
+			m_network->m_connectors.append(con);
+			m_network->adjustConnector(m_network->m_connectors.back());
+			updateConnectorSegmentItems(m_network->m_connectors.back(), nullptr);
+		}
 	}
 }
 
@@ -460,6 +511,12 @@ BlockItem * SceneManager::createBlockItem(Block & b) {
 	BlockItem * item = new BlockItem(&b);
 	item->setRect(0,0,b.m_size.width(), b.m_size.height());
 	item->setPos(b.m_pos);
+	return item;
+}
+
+
+ConnectorSegmentItem * SceneManager::createConnectorItem(Connector & con) {
+	ConnectorSegmentItem * item = new ConnectorSegmentItem(&con);
 	return item;
 }
 
@@ -481,13 +538,13 @@ QList<ConnectorSegmentItem *> SceneManager::createConnectorItems(Connector & con
 		m_blockConnectorMap[block].insert(&con); // remember association
 		QLineF endLine = block->socketStartLine(socket);
 
-		ConnectorSegmentItem * item = new ConnectorSegmentItem(&con);
+		ConnectorSegmentItem * item = createConnectorItem(con);
 		item->setLine(startLine);
 		item->setFlags(QGraphicsItem::ItemIsSelectable);
 		item->m_segmentIdx = -1; // start line
 		newConns.append(item);
 
-		item = new ConnectorSegmentItem(&con);
+		item = createConnectorItem(con);
 		item->setLine(endLine);
 		item->setFlags(QGraphicsItem::ItemIsSelectable);
 		item->m_segmentIdx = -2; // end line
@@ -496,7 +553,7 @@ QList<ConnectorSegmentItem *> SceneManager::createConnectorItems(Connector & con
 		QPointF start = startLine.p2();
 		for (int i=0; i<con.m_segments.count(); ++i) {
 			const Connector::Segment & seg = con.m_segments[i];
-			item = new ConnectorSegmentItem(&con);
+			item = createConnectorItem(con);
 			QPointF next(start);
 			if (seg.m_direction == Qt::Horizontal)
 				next += QPointF(seg.m_offset, 0);
@@ -516,6 +573,34 @@ QList<ConnectorSegmentItem *> SceneManager::createConnectorItems(Connector & con
 	}
 
 	return newConns;
+}
+
+
+void SceneManager::onSelectionChanged() {
+	// get newly selected items, and if a connector is part of the selection, select all segments of the same collector,
+	// but deselect all others
+	QList<QGraphicsItem *> items = QGraphicsScene::selectedItems();
+
+	QList<Connector*> selectedCons;
+	for (QGraphicsItem * item : items) {
+		ConnectorSegmentItem * segItem = dynamic_cast<ConnectorSegmentItem*>(item);
+		if (segItem == nullptr)
+			continue;
+		if (selectedCons.count(segItem->m_connector) == 0)
+			selectedCons.append(segItem->m_connector);
+	}
+
+	// if a connector segment was selected, de-select only the last connector and all segments of the same
+	if (!selectedCons.isEmpty()) {
+//		disconnect(this, &SceneManager::selectionChanged, this, &SceneManager::onSelectionChanged);
+		clearSelection();
+		// now select all items that belong to the connector
+		for (ConnectorSegmentItem * item : m_connectorSegmentItems) {
+			if (item->m_connector == selectedCons.back())
+				item->setSelected(true);
+		}
+//		connect(this, &SceneManager::selectionChanged, this, &SceneManager::onSelectionChanged);
+	}
 }
 
 
@@ -569,7 +654,7 @@ void SceneManager::updateConnectorSegmentItems(const Connector & con, ConnectorS
 
 	// add missing items
 	for (int i=segmentItems.count(); i<itemsNeeded; ++i) {
-		ConnectorSegmentItem * item = new ConnectorSegmentItem(const_cast<Connector*>(&con)); // need to get write access for connector in newly created item
+		ConnectorSegmentItem * item = createConnectorItem(const_cast<Connector&>(con)); // need to get write access for connector in newly created item
 		item->m_isHighlighted = highlighted;
 		addItem(item);
 		m_connectorSegmentItems.append(item);

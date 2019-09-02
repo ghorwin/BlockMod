@@ -79,7 +79,7 @@ SocketItem * BlockItem::inletSocketAcceptingConnection(const QPointF & scenePos)
 
 // *** protected functions ***
 
-/*! This function is called from the constructor and creates child socket items. */
+
 void BlockItem::createSocketItems() {
 	Q_ASSERT(m_socketItems.isEmpty());
 
@@ -97,9 +97,7 @@ void BlockItem::createSocketItems() {
 }
 
 
-void BlockItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-			QWidget */*widget*/)
-{
+void BlockItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget */*widget*/) {
 	// special handling for invisible blocks
 	if (m_block->m_name == Globals::InvisibleLabel)
 		return; // nothing to be drawn

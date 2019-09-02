@@ -40,6 +40,7 @@ namespace BLOCKMOD {
 
 class Connector;
 
+/*! A segment (line item) of a connection. */
 class ConnectorSegmentItem : public QGraphicsLineItem {
 public:
 	explicit ConnectorSegmentItem(Connector * connector);
@@ -65,14 +66,19 @@ protected:
 	/*! Re-implemented to draw the highlighted connection. */
 	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+	/*! Re-implemented to highlight the entire connection line (all segments) when hovered. */
 	virtual void hoverEnterEvent (QGraphicsSceneHoverEvent *event) override;
+	/*! Re-implemented to turn off highlighting of the entire connection line (all segments) when hovered. */
 	virtual void hoverLeaveEvent (QGraphicsSceneHoverEvent *event) override;
 
+	/*! Re-implemented to select the segment and all other segments. */
+	virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 	/*! Re-implemented to reset the m_moved flag. */
 	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
 	/*! Overloaded to react on item move.
-		Implements the snap-to-grid functionality. */
+		Implements the snap-to-grid functionality.
+	*/
 	virtual QVariant itemChange(GraphicsItemChange change, const QVariant & value) override;
 
 private:

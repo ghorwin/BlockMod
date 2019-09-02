@@ -87,6 +87,16 @@ public:
 	/*! Toggles high-lighting of connector segments. */
 	void highlightConnectorSegments(const Connector & con, bool highlighted);
 
+	/*! This will select all not yet selected segments of this connector.
+		\note Item change flag will be turned off for all touched items, so that
+		this function is not called several times.
+	*/
+	void selectConnectorSegments(const Connector & con);
+
+	/*! Connected to selectionChanged() signal. */
+	void onSelectionChanged();
+
+
 	/*! This function removes line segments with 0 offset and merges the neighboring segments into one.
 		Must not be called from within a move operation (only, for example, from mouse-release event handlers).
 	*/
@@ -149,9 +159,17 @@ protected:
 	*/
 	virtual BlockItem * createBlockItem(Block & b);
 
+	/*! Create the graphics item for a single connector line segment.
+		You can override this method and create your own graphics items, derived from
+		base class ConnectorSegmentItem (which contains all the move/selection logic).
+	*/
+	virtual ConnectorSegmentItem * createConnectorItem(Connector & con);
+
 	/*! A single connect yields actually several line segments, which are created here.
 		You can override this method and create your own graphics items, derived from
 		base class ConnectorSegmentItem (which contains all the move/selection logic).
+		\note This function calls createConnectorItem() internally, so it may be sufficient to
+		replace the logic there.
 	*/
 	virtual QList<ConnectorSegmentItem *> createConnectorItems(Connector & con);
 
@@ -166,7 +184,6 @@ private:
 			first segment is treated as current item.
 	*/
 	void updateConnectorSegmentItems(const Connector & con, ConnectorSegmentItem * currentItem);
-
 
 	/*! The network that we own and manage. */
 	Network							*m_network;
