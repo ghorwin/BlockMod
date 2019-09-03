@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 		// This is our widget
 		BLOCKMOD::ZoomMeshGraphicsView * w = new BLOCKMOD::ZoomMeshGraphicsView;
 		w->setResolution(1); // in pix/m
-		w->setGridStep(80); // 80 pix/m; 8 pix/m for small grid
+		w->setGridStep(10*BLOCKMOD::Globals::GridSpacing); // 80 pix/m; 8 pix/m for small grid
 
 		// Create and load network
 		BLOCKMOD::Network network;

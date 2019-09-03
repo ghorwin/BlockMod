@@ -1,6 +1,10 @@
 # BlockMod - a C++/Qt library for modelling of block-based networks and connector routing
 
-## Goal and Vision
+First take a look at the following animation, which illustrates some of the basic functionality:
+
+![](BlockMod/doc/Functionality_2019-08-28.gif)
+
+## Goals, Vision and Design Requirements
 
 Block-based networks are needed for quite a few applications. When developing such an application, where users are allowed to create their own networks, you may need the following functionality:
 
@@ -14,16 +18,11 @@ User interaction:
 - connect blocks by dragging lines from socket to socket
 - moving blocks around, hereby keeping the connections and adjusting their geometry automatically
 
-Take a look at the following animation, which illustrates the basic functionality:
-
-![](BlockMod/doc/Functionality_2019-08-28.gif)
-
 Advanced features:
 
 - defining block geometry and their socket types and positions; when modifying existing blocks keep connections previously made (except when a socket is removed)
 
-
-## Programming Interface Concept
+## Application Programming Interface
 
 - access/retrieve data structure (the network)
 - create/manipulate data structure via API (adding/removing blocks and connectors)
@@ -39,10 +38,123 @@ Customizability:
 - export view of network as vector graphics image/print to printer/PDF
 - adjust style/view options
 
+# Download, building, examples
 
-## Implementation Concepts
+1. Clone the repository
+2. enter the build/cmake directory
+3. run `build.sh` or `build_x64.bat` (the scripts set environmental variables for Qt and Visual Studio 2015 on Windows, adjust those as needed before running the scripts)
 
-### Data structure
+## Examples
+
+* `SerializationTest` - reads/writes a network from file (in XML format); creates a new network on first run
+* `ShowNetworkTest` - Creates a network and displays it in the graphics view
+* `BlockModDemo` - A demonstration of all the capabilities of the BlockMod library; block/connector moving, creating/removing connections, adding/removing blocks, ...
+
+# Usage/User Interaction
+
+- Scroll wheel - zoom in/zoom out
+- single left click - select block/connector
+- CTRL + left click - select multiple blocks (but only one connector can be selected at a time!)
+- click and hold left mouse button and drag item - move blocks and connector segments
+
+When in connection mode (started with API call, see below):
+
+- hovering over outlet socket with highlight the socket
+- click and hold left mouse button on outlet socket will start a new connection
+- drag to free inlet socket (highlights when hovering over) and release mouse button to create connection
+- right-click to leave connection mode
+
+# API
+
+## Quick Start
+
+Compile the library (and set include/linker paths accordingly) or copy the BlockMod library source files into your project.
+
+Simple application to show a network.
+```c++
+// import the SceneManager and ZoomingMeshGraphicsView from BlockMod library
+#include <BM_ZoomMeshGraphicsView.h>
+#include <BM_SceneManager.h>
+#include <BM_Globals.h> // for GridSpacing
+
+// ...
+
+// create network and read from file
+BLOCKMOD::Network network;
+network.readXML("demo.bm");
+
+// create scene
+BLOCKMOD::SceneManager * networkManager = new BLOCKMOD::SceneManager;
+networkManager->setNetwork(network); // network is now known and managed by scene manager
+
+// create view and adjust background grid
+BLOCKMOD::ZoomMeshGraphicsView * w = new BLOCKMOD::ZoomMeshGraphicsView;
+w->setResolution(1);
+w->setGridStep(10*BLOCKMOD::Globals::GridSpacing); // align to grid
+
+// set scene and show view
+w->setScene(networkManager);
+w->show();
+```
+
+## Manipulating the network
+
+### Adding/removing blocks
+
+```c++
+const double GS = BLOCKMOD::Globals::GridSpacing;
+
+BLOCKMOD::Block b;
+b.m_name = "New Block"; // give it a name
+b.m_size = QSizeF(5*GS, 10*GS); // size - aligned to grid
+b.m_pos = QPointF(20*GS, 5*GS); // position - aligned to grid
+
+// add an inlet socket to the left of the block
+BLOCKMOD::Socket s;
+s.m_name = "Inlet 1";
+s.m_inlet = true;
+s.m_pos = QPointF(0, 2*GS);
+s.m_orientation = Qt::Horizontal;
+b.m_sockets.append(s);
+
+// add an outlet socket to the right
+BLOCKMOD::Socket s2("Outlet 2", QPointF(b.m_size.width(), 2*GS), Qt::Horizontal, false);
+b.m_sockets.append(s2);
+
+// finally add the block to the managed network
+networkManager->addBlock(b);
+```
+
+Removing a block can be done via ```SceneManager::removeBlock(...)```.
+
+### Retrieving the network and setting a new network
+
+```c++
+// get the network
+BLOCKMOD::Network n = networkManager->network();
+
+// set the network
+networkManager->setNetwork(n);
+```
+That's also, how you implement undo/redo functionality. Just take the network after every operation
+and store it in an undo action. During an undo, simply swap out the cached and new network.
+
+### Adding/Removing connectors
+
+To add a new connector, create a new connector object ```BLOCKMOD::Connector``` and set name,
+source and target socket identifiers. Flat socket identifiers have the format: `<block name>.<socket name>`. Hence, block names **must not have a dot character in the name**. Block names and socket names must match existing blocks/sockets in the network, before you call ```SceneManager::addConnector()```.
+
+Use ```SceneManager::removeConnector(...)``` to remove an existing connector.
+
+### Starting connection mode
+
+In _connection mode_ the scene shows a cross mouse cursor and allows new connections to be made between outlet and inlet sockets.
+
+Call ```SceneManager::enableConnectionMode()``` to put the scene into connection mode.
+
+# Implementation
+
+## Data structure
 Data structure `Network` contains `Block` definitions. Each block may have several sockets, either input or output sockets. Sockets may be connected via `Connectors`, which also belong to the network.
 
 Blocks, their sockets and connector can have custom properties, managed by property lists.

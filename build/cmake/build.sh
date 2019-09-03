@@ -71,12 +71,18 @@ fi &&
 cd $BUILDDIR && cmake $CMAKE_OPTIONS $CMAKE_BUILD_TYPE $CMAKE_COMPILER_OPTIONS $CMAKELISTSDIR && make -j$MAKE_CPUCOUNT &&
 cd $CMAKELISTSDIR &&
 
-echo "*** Copying BlockModDemo to bin/release ***" &&
+echo "*** Copying executables to bin/release ***" &&
 mkdir -p ../../bin/release &&
 if [ -d $BUILDDIR/BlockModDemo/BlockModDemo.app ]
 then
     rm -rf ../../bin/release/BlockModDemo.app
     cp -r $BUILDDIR/BlockModDemo/BlockModDemo.app ../../bin/release/BlockModDemo.app
+    rm ../../bin/release/SerializationTest
+    cp $BUILDDIR/BlockModTests/SerializationTest ../../bin/release/SerializationTest
+    rm ../../bin/release/ShowNetworkTest
+    cp $BUILDDIR/BlockModTests/ShowNetworkTest ../../bin/release/ShowNetworkTest
 else
     cp $BUILDDIR/BlockModDemo/BlockModDemo ../../bin/release/BlockModDemo
+    cp $BUILDDIR/BlockModTests/SerializationTest ../../bin/release/SerializationTest
+    cp $BUILDDIR/BlockModTests/ShowNetworkTest ../../bin/release/ShowNetworkTest
 fi

@@ -44,10 +44,13 @@ public:
 	*/
 	static bool nearZero(double gridDistance);
 
+	/*! The grid spacing, used to align blocks/connectors/sockets and snap to while moving. */
 	static double GridSpacing;
 
+	/*! Size of labels to draw on sockets. */
 	static double LabelFontSize;
 
+	/*! Constant to identify hidden block used during connection operation. */
 	static const char * const InvisibleLabel;
 };
 
