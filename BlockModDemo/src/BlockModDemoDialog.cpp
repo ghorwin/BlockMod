@@ -10,6 +10,7 @@
 #include <BM_SceneManager.h>
 #include <BM_Network.h>
 #include <BM_BlockItem.h>
+#include <BM_ConnectorSegmentItem.h>
 
 BlockModDemoDialog::BlockModDemoDialog(QWidget *parent) :
 	QDialog(parent, Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint),
@@ -87,19 +88,17 @@ void BlockModDemoDialog::on_pushButtonConnectSockets_clicked() {
 void BlockModDemoDialog::on_pushButtonRemoveBlock_clicked() {
 	// find out selected blocks
 
-	QList<QGraphicsItem*> selectedItems = m_sceneManager->selectedItems();
-	QList<BLOCKMOD::BlockItem *> selectedBlocks;
-	for (QGraphicsItem * item : selectedItems) {
-		BLOCKMOD::BlockItem * bi = dynamic_cast<BLOCKMOD::BlockItem *>(item);
-		if (bi != nullptr)
-			selectedBlocks.append(bi);
+	QList<const BLOCKMOD::Block *> selectedBlocks = m_sceneManager->selectedBlocks();
+	for (const BLOCKMOD::Block * bi : selectedBlocks) {
+		m_sceneManager->removeBlock(bi);
 	}
+}
 
-	for (BLOCKMOD::BlockItem * bi : selectedBlocks) {
-		for (int idx = 0; idx < m_sceneManager->network().m_blocks.count(); ++idx) {
-			if (&m_sceneManager->network().m_blocks[idx] == bi->block()) {
-				m_sceneManager->removeBlock(idx);
-			}
-		}
-	}
+
+void BlockModDemoDialog::on_pushButtonRemoveConnection_clicked() {
+	// no connector selected?
+	const BLOCKMOD::Connector * con = m_sceneManager->selectedConnector();
+	if (con == nullptr)
+		return;
+	m_sceneManager->removeConnector(con);
 }

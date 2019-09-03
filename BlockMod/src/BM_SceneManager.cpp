@@ -366,6 +366,42 @@ void SceneManager::startSocketConnection(const SocketItem & outletSocketItem, co
 }
 
 
+QList<const Block*> SceneManager::selectedBlocks() const {
+	QList<QGraphicsItem*> selected = selectedItems();
+	QList<const BLOCKMOD::Block *> selectedBlocks;
+	for (QGraphicsItem * item : selected) {
+		BLOCKMOD::BlockItem * bi = dynamic_cast<BLOCKMOD::BlockItem *>(item);
+		if (bi != nullptr)
+			selectedBlocks.append(bi->block());
+	}
+	return selectedBlocks;
+}
+
+
+const Connector * SceneManager::selectedConnector() const {
+	QList<QGraphicsItem*> selected = selectedItems();
+	// find selected connector
+	for (QGraphicsItem * item : selected) {
+		BLOCKMOD::ConnectorSegmentItem * segi = dynamic_cast<BLOCKMOD::ConnectorSegmentItem *>(item);
+		if (segi != nullptr) {
+			return segi->m_connector;
+		}
+	}
+	return nullptr;
+}
+
+
+void SceneManager::removeBlock(const Block * block) {
+	int idx = 0;
+	for (;idx<m_network->m_blocks.count(); ++idx)
+		if (block == &m_network->m_blocks[idx])
+			break;
+	if (idx == m_network->m_blocks.count())
+		throw std::runtime_error("[SceneManager::removeBlock] Invalid pointer (not in managed network)");
+	removeBlock(idx);
+}
+
+
 void SceneManager::removeBlock(int blockIndex) {
 	Q_ASSERT(m_network->m_blocks.count() > blockIndex);
 	Q_ASSERT(m_blockItems.count() > blockIndex);
@@ -403,6 +439,44 @@ void SceneManager::removeBlock(int blockIndex) {
 
 }
 
+
+void SceneManager::removeConnector(const Connector * con) {
+	int idx = 0;
+	for (;idx<m_network->m_connectors.count(); ++idx)
+		if (con == &m_network->m_connectors[idx])
+			break;
+	if (idx == m_network->m_connectors.count())
+		throw std::runtime_error("[SceneManager::removeConnector] Invalid pointer (not in managed network)");
+	removeConnector(idx);
+}
+
+
+void SceneManager::removeConnector(int connectorIndex) {
+	Q_ASSERT(m_network->m_connectors.count() > connectorIndex);
+
+	Connector * conToBeRemoved = &m_network->m_connectors[connectorIndex];
+
+	// find corresponding connector items
+	int i=0;
+	while (i<m_connectorSegmentItems.count()) {
+		if (m_connectorSegmentItems[i]->m_connector == conToBeRemoved) {
+			delete m_connectorSegmentItems[i];
+			m_connectorSegmentItems.removeAt(i);
+			continue;
+		}
+		++i;
+	}
+
+	// remove connector associations in block-connector-map
+	for (QMap<const Block*, QSet<Connector*> >::iterator it = m_blockConnectorMap.begin(); it != m_blockConnectorMap.end(); ++it) {
+		QSet<Connector*> & conList = it.value();
+		conList.remove(conToBeRemoved);
+	}
+
+	// finally remove connector at given index
+	m_network->m_connectors.removeAt(connectorIndex);
+
+}
 
 
 // ** protected functions **

@@ -131,13 +131,43 @@ public:
 	void startSocketConnection(const SocketItem & outletSocketItem, const QPointF & mousePos);
 
 
+	// functions to query current selection
+
+	/*! There can be several currently selected blocks.
+		\return Returns a list of selected blocks or an empty list, if none is selected.
+	*/
+	QList<const Block*> selectedBlocks() const;
+
+	/*! There can be only one selected connector.
+		\return Returns a pointer to the selected connector or a nullptr, if none is selected.
+	*/
+	const Connector * selectedConnector() const;
+
+
 	// functions to modify managed network
+
+	/*! Removes the block by giving a pointer to the block.
+		Block must be stored in the network's block list.
+		Also removes any connections made to this block.
+	*/
+	void removeBlock(const Block * block);
 
 	/*! Removes the block at the given index in the network's block list.
 		Index must be a valid, otherwise an exception is raised.
 		Also removes any connections made to this block.
 	*/
 	void removeBlock(int blockIndex);
+
+	/*! Removes connector by giving a pointer to a connector in the managed network.
+		Connector must be stored in the network's connector list.
+	*/
+	void removeConnector(const Connector * con);
+
+	/*! Removes connector with given index.
+		Index must be a valid, otherwise an exception is raised.
+	*/
+	void removeConnector(int connectorIndex);
+
 
 
 protected:

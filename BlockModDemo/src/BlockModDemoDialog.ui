@@ -124,6 +124,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="pushButtonRemoveConnection">
+          <property name="text">
+           <string>Remove connection</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pushButtonRemoveBlock">
           <property name="text">
            <string>Remove block</string>
