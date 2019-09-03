@@ -10,31 +10,37 @@ Block-based networks are needed for quite a few applications. When developing su
 
 User interaction:
 
-- selecting/deselecting blocks
+- selecting/deselecting blocks and connections
 - connect blocks by dragging lines from socket to socket
 - moving blocks around, hereby keeping the connections and adjusting their geometry automatically
-- defining block geometry and their socket types and positions; when modifying existing blocks keep connections previously made (except when a socket is removed)
 
 Take a look at the following animation, which illustrates the basic functionality:
 
 ![](BlockMod/doc/Functionality_2019-08-28.gif)
 
-Data handling:
+Advanced features:
 
-- access/retrieve data structure
-- create/manipulate data structure via API
-- serialize/deserialize data structure
+- defining block geometry and their socket types and positions; when modifying existing blocks keep connections previously made (except when a socket is removed)
 
-Also important:
-- export view of network as vector graphics image/print to printer/PDF
-- adjust style/view options
+
+## Programming Interface Concept
+
+- access/retrieve data structure (the network)
+- create/manipulate data structure via API (adding/removing blocks and connectors)
+- serialize/deserialize data structure (read/write to xml stream and/or file)
 
 Customizability:
 
 - override default appearance/drawing of blocks, sockets and connectors
 - create blocks with additional side effects (e.g. mouse hovering shows auxilliary attributes)
 
-## Basic Concepts
+## Auxilliary features
+
+- export view of network as vector graphics image/print to printer/PDF
+- adjust style/view options
+
+
+## Implementation Concepts
 
 ### Data structure
 Data structure `Network` contains `Block` definitions. Each block may have several sockets, either input or output sockets. Sockets may be connected via `Connectors`, which also belong to the network.
