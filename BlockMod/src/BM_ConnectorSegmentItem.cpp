@@ -207,7 +207,7 @@ QVariant ConnectorSegmentItem::itemChange(GraphicsItemChange change, const QVari
 			double dx = moveDist.x();
 			double dy = moveDist.y();
 
-			while (--segIdx >= 0 && (!Globals::nearZero(dx) || !Globals::nearZero(dy)) ) {
+			while ((--segIdx >= 0) && (!Globals::nearZero(dx) || !Globals::nearZero(dy)) ) {
 				// get next segment to the left
 				Connector::Segment & seg = m_connector->m_segments[segIdx];
 				if (!Globals::nearZero(dx)) {

@@ -163,6 +163,14 @@ void SceneManager::mergeConnectorSegments(Connector & con) {
 			Q_ASSERT(i == segItem->m_segmentIdx);
 			Connector::Segment & seg = con.m_segments[i];
 
+			// if segment has the same orientation as the previous segment, we merge it such that the previous segment gets modified
+			// and the current segment gets offset of zero
+			if (i>0 && con.m_segments[i-1].m_direction == seg.m_direction) {
+				con.m_segments[i-1].m_offset += seg.m_offset;
+				seg.m_offset = 0;
+				updateSegments = true;
+			}
+
 			if (Globals::nearZero(seg.m_offset)) {
 				break;
 			}
