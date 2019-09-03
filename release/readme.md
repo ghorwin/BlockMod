@@ -1,3 +1,3 @@
 # Library Releases
 
-This directory contains auxilliary files needed for library releases.
+This directory contains scripts to create release distributions and the demo applications.
