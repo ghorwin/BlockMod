@@ -146,6 +146,17 @@ public:
 
 	// functions to modify managed network
 
+	/*! Adds a new block to the network.
+		The block is copied into the network and shown at the given coordinates.
+	*/
+	void addBlock(const Block & block);
+
+	/*! Adds a new connector.
+		The source and target sockets must match existing blocks/sockets in the network.
+		Otherwise an exception is thrown.
+	*/
+	void addConnector(const Connector & con);
+
 	/*! Removes the block by giving a pointer to the block.
 		Block must be stored in the network's block list.
 		Also removes any connections made to this block.
@@ -153,7 +164,7 @@ public:
 	void removeBlock(const Block * block);
 
 	/*! Removes the block at the given index in the network's block list.
-		Index must be a valid, otherwise an exception is raised.
+		Index must be a valid, otherwise an exception is thrown.
 		Also removes any connections made to this block.
 	*/
 	void removeBlock(int blockIndex);
@@ -164,7 +175,7 @@ public:
 	void removeConnector(const Connector * con);
 
 	/*! Removes connector with given index.
-		Index must be a valid, otherwise an exception is raised.
+		Index must be a valid, otherwise an exception is thrown.
 	*/
 	void removeConnector(int connectorIndex);
 

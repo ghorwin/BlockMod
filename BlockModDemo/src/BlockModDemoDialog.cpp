@@ -11,6 +11,7 @@
 #include <BM_Network.h>
 #include <BM_BlockItem.h>
 #include <BM_ConnectorSegmentItem.h>
+#include <BM_Globals.h>
 
 BlockModDemoDialog::BlockModDemoDialog(QWidget *parent) :
 	QDialog(parent, Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint),
@@ -85,6 +86,7 @@ void BlockModDemoDialog::on_pushButtonConnectSockets_clicked() {
 	m_sceneManager->enableConnectionMode();
 }
 
+
 void BlockModDemoDialog::on_pushButtonRemoveBlock_clicked() {
 	// find out selected blocks
 
@@ -101,4 +103,47 @@ void BlockModDemoDialog::on_pushButtonRemoveConnection_clicked() {
 	if (con == nullptr)
 		return;
 	m_sceneManager->removeConnector(con);
+}
+
+void BlockModDemoDialog::on_pushButtonAddBlock_clicked() {
+	// generate a random block and add it to the scene
+	BLOCKMOD::Block b;
+	int len = 4+int(qrand()*4.0/RAND_MAX);
+	for (int i=0; i<len; ++i)
+		b.m_name.append('a'+int(qrand()*26.0/RAND_MAX));
+
+	int gridX = len+4+int(qrand()*8.0/RAND_MAX);
+	int gridY = 3+int(qrand()*8.0/RAND_MAX);
+
+	b.m_size = QSizeF(gridX*BLOCKMOD::Globals::GridSpacing, gridY*BLOCKMOD::Globals::GridSpacing);
+	b.m_pos = QPointF(int(qrand()*30.0/RAND_MAX)*BLOCKMOD::Globals::GridSpacing, int(qrand()*30.0/RAND_MAX)*BLOCKMOD::Globals::GridSpacing);
+
+
+	// create and position sockets
+	for (int i=0; i<gridX-2; i+=2) {
+		bool haveSocket = qrand()*6.0/RAND_MAX < 1;
+		if (haveSocket) {
+			BLOCKMOD::Socket s;
+			s.m_inlet = qrand()*2.0/RAND_MAX < 1;
+			int slen = int(qrand()*6.0/RAND_MAX);
+			for (int i=0; i<slen; ++i)
+				s.m_name.append('a'+int(qrand()*26.0/RAND_MAX));
+			s.m_orientation = Qt::Vertical;
+			s.m_pos = QPointF((i+1)*BLOCKMOD::Globals::GridSpacing, 0);
+			b.m_sockets.append(s);
+		}
+		haveSocket = qrand()*6.0/RAND_MAX < 1;
+		if (haveSocket) {
+			BLOCKMOD::Socket s;
+			s.m_inlet = qrand()*2.0/RAND_MAX < 1;
+			int slen = int(qrand()*6.0/RAND_MAX);
+			for (int i=0; i<slen; ++i)
+				s.m_name.append('a'+int(qrand()*26.0/RAND_MAX));
+			s.m_orientation = Qt::Vertical;
+			s.m_pos = QPointF((i+1)*BLOCKMOD::Globals::GridSpacing, b.m_size.height());
+			b.m_sockets.append(s);
+		}
+	}
+
+	m_sceneManager->addBlock(b);
 }

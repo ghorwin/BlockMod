@@ -31,6 +31,8 @@ private slots:
 
 	void on_pushButtonRemoveConnection_clicked();
 
+	void on_pushButtonAddBlock_clicked();
+
 private:
 	void loadNetwork(const QString & fname);
 

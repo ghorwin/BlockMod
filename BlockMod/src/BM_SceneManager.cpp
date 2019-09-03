@@ -391,6 +391,40 @@ const Connector * SceneManager::selectedConnector() const {
 }
 
 
+void SceneManager::addBlock(const Block & block) {
+	m_network->m_blocks.append(block);
+	BlockItem * item = createBlockItem( m_network->m_blocks.back() );
+	addItem(item);
+	m_blockItems.append(item);
+}
+
+
+void SceneManager::addConnector(const Connector & con) {
+	// first check, that indeed the source/target connectors are valid
+	const Block * b1, * b2;
+	const Socket * s1, * s2;
+	try {
+		m_network->lookupBlockAndSocket(con.m_sourceSocket, b1, s1);
+	} catch (...) {
+		throw std::runtime_error("[SceneManager::addConnector] Invalid source socket identifyer.");
+	}
+	try {
+		m_network->lookupBlockAndSocket(con.m_targetSocket, b2, s2);
+	} catch (...) {
+		throw std::runtime_error("[SceneManager::addConnector] Invalid target socket identifyer.");
+	}
+	if (s1->m_inlet)
+		throw std::runtime_error("[SceneManager::addConnector] Invalid source socket (must be an outlet socket).");
+	if (!s2->m_inlet)
+		throw std::runtime_error("[SceneManager::addConnector] Invalid target socket (must be an inlet socket).");
+	// check, if inlet socket is already connected to
+	if (isConnectedSocket(b2, s2))
+		throw std::runtime_error("[SceneManager::addConnector] Invalid target socket (has already an incoming connection).");
+	m_network->m_connectors.append(con);
+	m_network->adjustConnector(m_network->m_connectors.back());
+}
+
+
 void SceneManager::removeBlock(const Block * block) {
 	int idx = 0;
 	for (;idx<m_network->m_blocks.count(); ++idx)
@@ -436,7 +470,6 @@ void SceneManager::removeBlock(int blockIndex) {
 	for (Connector & con : m_network->m_connectors) {
 		updateConnectorSegmentItems(con, nullptr);
 	}
-
 }
 
 
