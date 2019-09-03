@@ -143,31 +143,48 @@ void Network::writeXML(const QString & fname) const {
 
 void Network::checkNames() const {
 	QSet<QString> blockNames;
-	QSet<QString> socketNames;
 	for (int i=0; i<m_blocks.count(); ++i) {
 		QString bName = m_blocks[i].m_name;
-		if (bName.indexOf(".") != -1) {
-			qDebug() << QString("Invalid Block ID name '%1'").arg(bName);
-		}
-		if (blockNames.contains(bName)) {
-			qDebug() << QString("Duplicate Block ID name '%1'").arg(bName);
-		}
+		if (bName.indexOf(".") != -1)
+			throw std::runtime_error("Invalid Block ID name '"+bName.toStdString()+"'");
+		if (blockNames.contains(bName))
+			throw std::runtime_error("Duplicate Block ID name '"+bName.toStdString()+"'");
 		blockNames.insert(bName);
 		qDebug() << bName;
 		// now all sockets
+		QSet<QString> socketNames;
 		for (int j=0; j<m_blocks[i].m_sockets.count(); ++j) {
 			QString sName = m_blocks[i].m_sockets[j].m_name;
-			if (sName.indexOf(".") != -1) {
-				qDebug() << QString("Invalid Socket ID name '%1'").arg(sName);
-			}
-			// get flattened name
-			sName = bName + "." + sName;
-			if (socketNames.contains(sName)) {
-				qDebug() << QString("Duplicate Socket ID name '%1'").arg(sName);
-			}
+			// check if such a name already exists
+			if (socketNames.contains(sName))
+				throw std::runtime_error("Duplicate Socket ID name '"+sName.toStdString()+"' within block '"+bName.toStdString()+"'");
 			socketNames.insert(sName);
 			qDebug() << sName;
 		}
+	}
+	// check all connections for valid socket names
+	QSet<QString> connectedSockets;
+	for (const Connector & con : m_connectors) {
+		// first check, that indeed the source/target connectors are valid
+		const Block * b1, * b2;
+		const Socket * s1, * s2;
+		try {
+			lookupBlockAndSocket(con.m_sourceSocket, b1, s1);
+		} catch (...) {
+			throw std::runtime_error("Invalid source socket identifyer '"+con.m_sourceSocket.toStdString()+"'.");
+		}
+		try {
+			lookupBlockAndSocket(con.m_targetSocket, b2, s2);
+		} catch (...) {
+			throw std::runtime_error("Invalid target socket identifyer '"+con.m_targetSocket.toStdString()+"'.");
+		}
+		if (s1->m_inlet)
+			throw std::runtime_error("Invalid source socket '"+con.m_sourceSocket.toStdString()+"'(must be an outlet socket).");
+		if (!s2->m_inlet)
+			throw std::runtime_error("Invalid target socket '"+con.m_targetSocket.toStdString()+"' (must be an inlet socket).");
+		if (connectedSockets.contains(con.m_targetSocket))
+			throw std::runtime_error("Target socket '"+con.m_targetSocket.toStdString()+"' connected twice!");
+		connectedSockets.insert(con.m_targetSocket);
 	}
 }
 
