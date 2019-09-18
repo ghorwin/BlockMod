@@ -105,6 +105,7 @@ void BlockModDemoDialog::on_pushButtonRemoveConnection_clicked() {
 	m_sceneManager->removeConnector(con);
 }
 
+
 void BlockModDemoDialog::on_pushButtonAddBlock_clicked() {
 	// generate a random block and add it to the scene
 	BLOCKMOD::Block b;
