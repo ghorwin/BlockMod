@@ -181,6 +181,12 @@ public:
 
 
 
+signals:
+	/*! Emitted when a new connection was made and a connector was added.
+		The new connector is added to the end of the connectors in the network.
+	*/
+	void newConnectionAdded();
+
 protected:
 
 	/*! Listens for right-mouse-button clicks that turn off connection mode. */

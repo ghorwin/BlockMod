@@ -617,6 +617,7 @@ void SceneManager::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 			m_network->m_connectors.append(con);
 			m_network->adjustConnector(m_network->m_connectors.back());
 			updateConnectorSegmentItems(m_network->m_connectors.back(), nullptr);
+			emit newConnectionAdded();
 		}
 	}
 }

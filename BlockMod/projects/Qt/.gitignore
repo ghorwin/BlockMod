@@ -1,1 +1,7 @@
 *.pro.user
+/.qmake.stash
+/Makefile
+/Makefile.BlockMod
+/debug_x64/
+/moc/
+/qrc_BlockMod.cpp

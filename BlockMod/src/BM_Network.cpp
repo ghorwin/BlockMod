@@ -55,6 +55,12 @@ Network::Network()
 }
 
 
+void Network::swap(Network & other) {
+	other.m_blocks.swap(m_blocks);
+	other.m_connectors.swap(m_connectors);
+}
+
+
 void Network::readXML(const QString & fname) {
 
 	QFile xmlFile(fname);
@@ -283,6 +289,50 @@ void Network::lookupBlockAndSocket(const QString & flatName, const Block *& bloc
 
 	const Socket & s = *socketIt;
 	socket = &s;
+}
+
+
+void Network::removeBlock(unsigned int blockIdx) {
+	Q_ASSERT(blockIdx < static_cast<unsigned int>(m_blocks.count()));
+
+	// get block ID name
+	QString bName = m_blocks[blockIdx].m_name;
+
+	// erase all connectors that refer to this block
+	int i=0;
+	while (i<m_connectors.count()) {
+		QString blockName, socketName;
+		splitFlatName(m_connectors[i].m_sourceSocket, blockName, socketName);
+		if (blockName == bName) {
+			m_connectors.removeAt(i);
+			continue;
+		}
+		splitFlatName(m_connectors[i].m_targetSocket, blockName, socketName);
+		if (blockName == bName) {
+			m_connectors.removeAt(i);
+			continue;
+		}
+		++i;
+	}
+	m_blocks.removeAt(blockIdx);
+}
+
+
+void Network::renameBlock(unsigned int blockIdx, const QString &newName) {
+	QString oldName = m_blocks[blockIdx].m_name;
+	m_blocks[blockIdx].m_name = newName;
+
+	for (int i=0; i<m_connectors.count(); ++i) {
+		QString blockName, socketName;
+		splitFlatName(m_connectors[i].m_sourceSocket, blockName, socketName);
+		if (blockName == oldName) {
+			m_connectors[i].m_sourceSocket = newName + "." + socketName;
+		}
+		splitFlatName(m_connectors[i].m_targetSocket, blockName, socketName);
+		if (blockName == oldName) {
+			m_connectors[i].m_targetSocket = newName + "." + socketName;
+		}
+	}
 }
 
 

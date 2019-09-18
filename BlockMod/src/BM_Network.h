@@ -54,6 +54,9 @@ public:
 	/*! Default C'tor. */
 	Network();
 
+	/*! Efficient swap function. */
+	void swap(Network & other);
+
 	/*! Reads network from file. */
 	void readXML(const QString & fname);
 	/*! Writes network to file. */
@@ -72,6 +75,14 @@ public:
 	/*! Searches block and socket data structure by flat variable name. */
 	void lookupBlockAndSocket(const QString & flatName, const Block * &block, const Socket * &socket) const;
 
+	/*! Removes block at given index and all associated connectors. */
+	void removeBlock(unsigned int blockIdx);
+
+	/*! Renames a block. */
+	void renameBlock(unsigned int blockIdx, const QString & newName);
+
+	// *** member variables ***
+
 	/*! List of all blocks in the network. */
 	QList<Block>		m_blocks;
 
@@ -80,6 +91,9 @@ public:
 		block-id and socket-id).
 	*/
 	QList<Connector>	m_connectors;
+
+
+	// *** static functions ***
 
 	/*! Takes a flat name of format <block-name>.<socket-name> and extracts both parts.
 		Throws an exception if . is missing or either name is an empty string.

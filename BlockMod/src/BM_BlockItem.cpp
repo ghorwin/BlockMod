@@ -77,6 +77,11 @@ SocketItem * BlockItem::inletSocketAcceptingConnection(const QPointF & scenePos)
 }
 
 
+bool BlockItem::isInvisible() const {
+	return m_block->m_name == Globals::InvisibleLabel;
+}
+
+
 // *** protected functions ***
 
 
@@ -99,7 +104,7 @@ void BlockItem::createSocketItems() {
 
 void BlockItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget */*widget*/) {
 	// special handling for invisible blocks
-	if (m_block->m_name == Globals::InvisibleLabel)
+	if (isInvisible())
 		return; // nothing to be drawn
 	painter->save();
 	painter->setRenderHint(QPainter::Antialiasing, true);

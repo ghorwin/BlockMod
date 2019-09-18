@@ -56,6 +56,9 @@ public:
 	*/
 	SocketItem * inletSocketAcceptingConnection(const QPointF & scenePos);
 
+	/*! Returns true, if this block is invisible (call this when re-implementing the paint() function). */
+	bool isInvisible() const;
+
 protected:
 	/*! This function is called from the constructor and creates child socket items.
 		You can overload this function to create your own socket items.
