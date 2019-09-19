@@ -2,6 +2,8 @@
 
 \mainpage Overview of the Block Modeling Toolkit
 
+\tableofcontents
+
 \section intro_sec What is the BlockMod library?
 
 BlockMod is a library for developing block modeling software. Block modeling is
@@ -142,4 +144,9 @@ Users may want to extend the library because:
 
 */
 
+
+/*! \brief The namespace BLOCKMOD contains all functions/classes/data types of the BLOCKMOD library.
+*/
+namespace BLOCKMOD {
+}
 
