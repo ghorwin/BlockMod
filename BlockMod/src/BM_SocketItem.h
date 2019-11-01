@@ -49,6 +49,9 @@ public:
 	*/
 	explicit SocketItem(BlockItem * parent, Socket * socket);
 
+	/*! Call this function whenever the socket's geometry in the associated socket object has changed. */
+	void updateSocketItem();
+
 	QRectF boundingRect() const override;
 
 	void setHoverEnabled(bool enabled);

@@ -56,6 +56,13 @@ SocketItem::SocketItem(BlockItem * parent, Socket * socket) :
 	m_hoverEnabled(false),
 	m_hovered(false)
 {
+	updateSocketItem();
+	setZValue(12);
+	setAcceptHoverEvents(true);
+}
+
+
+void SocketItem::updateSocketItem() {
 	if (m_socket->m_inlet) {
 		switch (m_socket->direction()) {
 			case Socket::Left		: m_symbolRect = QRectF(-4, m_socket->m_pos.y()-4, 8, 8); break;
@@ -72,8 +79,6 @@ SocketItem::SocketItem(BlockItem * parent, Socket * socket) :
 			case Socket::Bottom		: m_symbolRect = QRectF(m_socket->m_pos.x()-4, m_socket->m_pos.y(), 8, 8); break;
 		}
 	}
-	setZValue(12);
-	setAcceptHoverEvents(true);
 }
 
 
@@ -221,17 +226,17 @@ void SocketItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opt
 	QFontMetricsF metrics(f);
 	painter->setFont(f);
 	QRectF textBoundingRect = metrics.boundingRect(m_socket->m_name);
-	textBoundingRect.setWidth(textBoundingRect.width()+2);
+	textBoundingRect.setWidth(textBoundingRect.width()+6); // add some space to avoid clipping of italic fonts to the right
 
 	switch (m_socket->direction()) {
 		case Socket::Left		:
 			// left side
-			textBoundingRect.moveTo(r.left()-textBoundingRect.width(), r.top()-textBoundingRect.height());
+			textBoundingRect.moveTo(r.left()-textBoundingRect.width(), r.top()-textBoundingRect.height()+3);
 			painter->drawText(textBoundingRect, Qt::AlignRight | Qt::AlignTop, m_socket->m_name);
 		break;
 		case Socket::Right		:
 			// right side
-			textBoundingRect.moveTo(r.right(), r.top()-textBoundingRect.height());
+			textBoundingRect.moveTo(r.right(), r.top()-textBoundingRect.height()+3);
 			painter->drawText(textBoundingRect, Qt::AlignLeft | Qt::AlignTop, m_socket->m_name);
 		break;
 		case Socket::Top		:

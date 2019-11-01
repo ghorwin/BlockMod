@@ -67,12 +67,18 @@ public:
 	const Network & network() const;
 
 
+	// query functions
+
+	/*! Looks up the block item with a block that has the given name. */
+	const BlockItem * blockItemByName(const QString & blockName) const;
+
+
 	// Functions called from blocks/items to adjust the network due to user interaction
 
 	/*! Called from BlockItem when a block was moved to signal the scene manager
 		to adjust the connected connectors.
 	*/
-	void blockMoved(const Block * block);
+	void blockMoved(const Block * block, const QPointF oldPos);
 
 	/*! Called from ConnectorSegmentItem when a segment was moved to signal the scene manager
 		to adjust the connected connectors.
@@ -96,6 +102,8 @@ public:
 	/*! Connected to selectionChanged() signal. */
 	void onSelectionChanged();
 
+	/*! Called from a block item when a block has been double-clicked, emits signal blockActionTriggered()  */
+	void blockDoubleClicked(const BlockItem * blockItem);
 
 	/*! This function removes line segments with 0 offset and merges the neighboring segments into one.
 		Must not be called from within a move operation (only, for example, from mouse-release event handlers).
@@ -187,8 +195,13 @@ signals:
 	*/
 	void newConnectionAdded();
 
-protected:
+	/*! Emitted whenever a block action was triggered (usually by double-clicking on the block). */
+	void blockActionTriggered(const BlockItem * blockItem);
 
+	/*! Emitted when a block or connector has been moved. */
+	void networkGeometryChanged();
+
+protected:
 	/*! Listens for right-mouse-button clicks that turn off connection mode. */
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
 

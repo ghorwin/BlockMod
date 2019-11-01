@@ -102,6 +102,9 @@ public:
 		}
 	}
 
+	/*! Comparison operator to find socket by name. */
+	bool operator==(const QString & s) const { return m_name == s; }
+
 	QString			m_name;
 
 	/*! Position (connection point) of Socket.

@@ -37,6 +37,8 @@
 #include <QStringList>
 #include <QDebug>
 
+#include <cmath>
+
 #include "BM_XMLHelpers.h"
 #include "BM_Globals.h"
 
@@ -134,6 +136,234 @@ QLineF Block::socketStartLine(const Socket * socket) const {
 	return QLineF(startPoint, otherPoint);
 }
 
+
+void Block::findSocketInsertPosition(bool inletSocket, int & x, int & y) const {
+	// create list of socket positions
+	int rowCount = std::floor(m_size.height() / (double)Globals::GridSpacing + 0.5);
+	int colCount = std::floor(m_size.width() / (double)Globals::GridSpacing + 0.5);
+
+	std::vector<int> verticalSockets(rowCount-1, 0);
+	std::vector<int> horizontalSockets(colCount-1, 0);
+
+	QList<const Socket*> inletSockets = filterSockets(true);
+	if (inletSocket) {
+		for (const Socket* s : inletSockets) {
+			// determine position of the socket, and mark slot as taken
+			if (s->m_pos.y() == 0.0) {
+				// located at top
+				int colrowIdx = std::floor(s->m_pos.x() / (double)Globals::GridSpacing + 0.5);
+				// if 0 or > colCount-1, ignore
+				if (colrowIdx > 0 && colrowIdx < colCount-1)
+					horizontalSockets[colrowIdx] = 1;
+			}
+			else {
+				int rowIdx = std::floor(s->m_pos.y() / (double)Globals::GridSpacing + 0.5);
+				if (rowIdx > 0 && rowIdx < rowCount-1)
+					verticalSockets[rowIdx] = 1;
+			}
+		}
+		// first look for empty slot at left side
+		for (size_t i=0; i<verticalSockets.size(); ++i) {
+			if (verticalSockets[i] == 0) {
+				x=0;
+				y=i;
+				return;
+			}
+		}
+		for (size_t i=0; i<horizontalSockets.size(); ++i) {
+			if (horizontalSockets[i] == 0) {
+				y=0;
+				x=i;
+				return;
+			}
+		}
+		// duplicate sockets, select top-right slot
+		x=colCount-1;
+		y=0;
+		return;
+	}
+}
+
+
+void Block::unusedSocketSpots(QList<int> & leftSockets, QList<int> & topSockets, QList<int> & rightSockets, QList<int> & bottomSockets) {
+	// create list of socket positions
+	int rowCount = std::floor(m_size.height() / (double)Globals::GridSpacing + 0.5);
+	int colCount = std::floor(m_size.width() / (double)Globals::GridSpacing + 0.5);
+
+	leftSockets.clear();
+	rightSockets.clear();
+	for (int i=0; i<rowCount; ++i) {
+		leftSockets.push_back(0);
+		rightSockets.push_back(0);
+	}
+
+	topSockets.clear();
+	bottomSockets.clear();
+	for (int i=0; i<colCount; ++i) {
+		topSockets.push_back(0);
+		bottomSockets.push_back(0);
+	}
+
+	// now process all sockets
+	for (const Socket & s : m_sockets) {
+		int colIdx = std::floor(s.m_pos.x() / (double)Globals::GridSpacing + 0.5);
+		int rowIdx = std::floor(s.m_pos.y() / (double)Globals::GridSpacing + 0.5);
+
+		// left side?
+		if (s.m_pos.x() == 0.0) {
+			if (rowIdx > 0 && rowIdx < rowCount)
+				++leftSockets[rowIdx];
+		}
+
+		// right side?
+		if (s.m_pos.x() == m_size.width()) {
+			if (rowIdx > 0 && rowIdx < rowCount)
+				++rightSockets[rowIdx];
+		}
+
+		// top size
+		if (s.m_pos.y() == 0.0) {
+			if (colIdx > 0 && colIdx < colCount)
+				++topSockets[colIdx];
+		}
+
+		// bottom size
+		if (s.m_pos.y() == m_size.height()) {
+			if (colIdx > 0 && colIdx < colCount)
+				++bottomSockets[colIdx];
+		}
+	}
+}
+
+
+void Block::autoUpdateSockets(const QStringList & inletSockets, const QStringList & outletSockets) {
+	// determine number of block grid lines
+	int rowCount = std::floor(m_size.height() / (double)Globals::GridSpacing + 0.5);
+	int colCount = std::floor(m_size.width() / (double)Globals::GridSpacing + 0.5);
+
+	// now remove no-longer existing sockets and add and position new sockets
+
+	// first remove all sockets from block that are not in the list of inlet/outlet sockets
+	// this ensures that afterwards we only have valid
+	QList<BLOCKMOD::Socket> remainingSockets;
+	for (const BLOCKMOD::Socket & s : m_sockets) {
+		if (s.m_inlet) {
+			if (inletSockets.contains(s.m_name)) {
+				remainingSockets.append(s);
+			}
+		}
+		else {
+			if (outletSockets.contains(s.m_name)) {
+				remainingSockets.append(s);
+			}
+		}
+	}
+	m_sockets.swap(remainingSockets);
+
+	// get lists of free socket positions
+	QList<int> leftSockets, rightSockets, topSockets, bottomSockets;
+
+	unusedSocketSpots(leftSockets, topSockets, rightSockets, bottomSockets);
+
+	QStringList sockets = inletSockets;
+	sockets += outletSockets;
+	// now create sockets for each not yet existing variable
+	for (int sidx=0; sidx < sockets.count(); ++sidx) {
+		const QString & s = sockets[sidx];
+		// while searching for sockets we do not need to distinguish between inlet/outlet sockets,
+		// because in the step before we have filtered out all sockets that did not have a maching type
+		int socketIdx;
+		for (socketIdx=0; socketIdx < m_sockets.count(); ++socketIdx) {
+			if (m_sockets[socketIdx].m_name == s)
+				break;
+		}
+		// already defined?
+		if (socketIdx != m_sockets.count())
+			continue;
+		// create and position a new socket
+		Socket newSocket;
+		newSocket.m_name = s;
+		bool inlet = sidx < inletSockets.count();
+		newSocket.m_inlet = inlet;
+		// now find free slot, first search on left side
+		bool found = false;
+		for (int i=1; i<leftSockets.count(); ++i) {
+			if (inlet) {
+				if (leftSockets[i] == 0) {
+					// take this spot
+					leftSockets[i] = 1;
+					newSocket.m_pos.setX(0);
+					newSocket.m_pos.setY(i*Globals::GridSpacing);
+					found = true;
+					break;
+				}
+			}
+			else {
+				if (rightSockets[i] == 0) {
+					// take this spot
+					rightSockets[i] = 1;
+					newSocket.m_pos.setX(m_size.width());
+					newSocket.m_pos.setY(i*Globals::GridSpacing);
+					found = true;
+					break;
+				}
+			}
+		}
+		// no spot left, use right side
+		if (!found) {
+			for (int i=0; i<topSockets.count(); ++i) {
+				if (inlet) {
+					if (topSockets[i] == 0) {
+						// take this spot
+						topSockets[i] = 1;
+						newSocket.m_orientation = Qt::Vertical;
+						newSocket.m_pos.setY(0);
+						newSocket.m_pos.setX(i*Globals::GridSpacing);
+						found = true;
+						break;
+					}
+				}
+				else {
+					if (bottomSockets[i] == 0) {
+						// take this spot
+						bottomSockets[i] = 1;
+						newSocket.m_orientation = Qt::Vertical;
+						newSocket.m_pos.setY(m_size.height());
+						newSocket.m_pos.setX(i*Globals::GridSpacing);
+						found = true;
+						break;
+					}
+				}
+			}
+		}
+		// no spot left, use top-right spot
+		if (!found) {
+			if (inlet) {
+				newSocket.m_pos.setY(0);
+				newSocket.m_pos.setX(m_size.width() - Globals::GridSpacing);
+			}
+			else {
+				newSocket.m_pos.setY(m_size.height());
+				newSocket.m_pos.setX(m_size.width() - Globals::GridSpacing);
+			}
+		}
+		// finally, add new socket
+		m_sockets.append(newSocket);
+	}
+
+}
+
+
+QList<const Socket*> Block::filterSockets(bool inletSocket) const {
+	QList<const Socket*> socketList;
+	for (const Socket & s : m_sockets) {
+		if (inletSocket && s.m_inlet)
+			socketList.append(&s);
+		else if (!inletSocket && !s.m_inlet)
+			socketList.append(&s);
+	}
+	return socketList;
+}
 
 } // namespace BLOCKMOD
 

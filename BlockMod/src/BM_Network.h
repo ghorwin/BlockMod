@@ -64,6 +64,8 @@ public:
 	/*! Flattens all ID names of sockets and blocks and checks for duplicates. */
 	void checkNames() const;
 
+
+
 	/*! Processes all connectors and updates their segments so that start/end sockets are connected. */
 	void adjustConnectors();
 
@@ -78,7 +80,6 @@ public:
 	/*! Removes block at given index and all associated connectors. */
 	void removeBlock(unsigned int blockIdx);
 
-	/*! Renames a block. */
 	void renameBlock(unsigned int blockIdx, const QString & newName);
 
 	// *** member variables ***

@@ -57,7 +57,6 @@ SceneManager::SceneManager(QObject *parent) :
 	m_connectionModeEnabled(false)
 {
 	// listen for selection changes
-//	connect(this, &SceneManager::selectionChanged, this, &SceneManager::onSelectionChanged);
 }
 
 
@@ -73,6 +72,9 @@ void SceneManager::setNetwork(const Network & network) {
 	m_blockItems.clear();
 	qDeleteAll(m_connectorSegmentItems);
 	m_connectorSegmentItems.clear();
+
+	// clear block connector map
+	m_blockConnectorMap.clear();
 
 	// create new graphics items
 	for (int i=0; i<m_network->m_blocks.count(); ++i) {
@@ -99,7 +101,16 @@ const Network & SceneManager::network() const {
 }
 
 
-void SceneManager::blockMoved(const Block * block) {
+const BlockItem * SceneManager::blockItemByName(const QString & blockName) const {
+	for (BlockItem* item : m_blockItems) {
+		if (item->m_block->m_name == blockName)
+			return item;
+	}
+	return nullptr;
+}
+
+
+void SceneManager::blockMoved(const Block * block, const QPointF oldPos) {
 	// lookup connected connectors
 	QSet<Connector *> & cons = m_blockConnectorMap[block];
 	// adjust connectors to new block positions
@@ -108,12 +119,14 @@ void SceneManager::blockMoved(const Block * block) {
 		// update corresponding connectorItems (maybe remove/add items)
 		updateConnectorSegmentItems(*con, nullptr);
 	}
+	emit networkGeometryChanged(); /// \todo add old position to signal
 }
 
 
 void SceneManager::connectorSegmentMoved(ConnectorSegmentItem * currentItem) {
 	// update corresponding connectorItems (maybe remove/add items)
 	updateConnectorSegmentItems(*currentItem->m_connector, currentItem);
+	emit networkGeometryChanged();
 }
 
 
@@ -258,6 +271,7 @@ bool SceneManager::isConnectedSocket(const Block * b, const Socket * s) const {
 	}
 	return false;
 }
+
 
 
 void SceneManager::enableConnectionMode() {
@@ -522,6 +536,7 @@ void SceneManager::removeConnector(int connectorIndex) {
 
 // ** protected functions **
 
+
 void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 	if (mouseEvent->button() == Qt::RightButton) {
 		disableConnectionMode();
@@ -537,7 +552,6 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 		// make the last item the mouse grabber objects
 		m_blockItems.back()->grabMouse();
 	}
-
 }
 
 
@@ -717,6 +731,11 @@ void SceneManager::onSelectionChanged() {
 		}
 //		connect(this, &SceneManager::selectionChanged, this, &SceneManager::onSelectionChanged);
 	}
+}
+
+
+void SceneManager::blockDoubleClicked(const BlockItem * blockItem) {
+	emit blockActionTriggered(blockItem);
 }
 
 

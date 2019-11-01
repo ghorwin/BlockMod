@@ -82,6 +82,35 @@ bool BlockItem::isInvisible() const {
 }
 
 
+void BlockItem::resize(int newWidth, int newHeight) {
+	// adjust size of associated block
+	m_block->m_size = QSizeF(newWidth, newHeight);
+	setRect(0, 0, newWidth, newHeight);
+
+	// adjust positions of sockets
+	for (Socket & s : m_block->m_sockets) {
+		if (s.m_orientation == Qt::Horizontal) {
+			if (s.m_pos.x() != 0.0)
+				s.m_pos.setX(newWidth);
+		}
+		else {
+			if (s.m_pos.y() != 0.0)
+				s.m_pos.setY(newHeight);
+		}
+
+	}
+
+	// tell all sockest to update
+	for (QGraphicsItem * item : childItems()) {
+		SocketItem * sitem = (SocketItem*)(item);
+		sitem->updateSocketItem();
+		item->update();
+	}
+	update();
+
+}
+
+
 // *** protected functions ***
 
 
@@ -156,25 +185,32 @@ QVariant BlockItem::itemChange(GraphicsItemChange change, const QVariant & value
 		pos.setY( std::floor((pos.y()+0.5*Globals::GridSpacing) / Globals::GridSpacing) * Globals::GridSpacing);
 		if (m_block->m_pos != pos.toPoint()) {
 			m_moved = true;
+			QPointF oldPos = m_block->m_pos;
 			m_block->m_pos = pos.toPoint();
 			// inform network to update connectors
 			if (sceneManager != nullptr)
-				sceneManager->blockMoved(m_block);
+				sceneManager->blockMoved(m_block, oldPos);
 		}
 		// notify scene of changed scene rect
-		QGraphicsScene * sc = scene();
-		if (sc == nullptr)
+		if (sceneManager == nullptr)
 			return pos;
-		QRectF srect = scene()->sceneRect();
+		QRectF srect = sceneManager->sceneRect();
 		if (pos.x() < srect.left() || pos.y() < srect.top() ||
 			(pos.x() + rect().width()) > srect.right() ||
 			(pos.y() + rect().height()) > srect.bottom())
 		{
-			scene()->setSceneRect( QRectF()); // tell scene to recompute scene rect
+			sceneManager->setSceneRect( QRectF()); // tell scene to recompute scene rect
 		}
 		return pos;
 	}
 	return QGraphicsRectItem::itemChange(change, value);
+}
+
+
+void BlockItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
+	SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+	sceneManager->blockDoubleClicked(this);
+	QGraphicsRectItem::mouseDoubleClickEvent(event);
 }
 
 } // namespace BLOCKMOD

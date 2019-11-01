@@ -41,3 +41,6 @@ SOURCES += \
 	../../src/BM_BlockItem.cpp
 FORMS +=
 
+DISTFILES += \
+	../../doc/BlockMod-mainpage.h
+
