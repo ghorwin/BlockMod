@@ -63,12 +63,12 @@ void BlockModDemoDialog::loadNetwork(const QString & fname) {
 	try {
 		n.readXML(fname);
 		n.checkNames();
-		QList<BLOCKMOD::Connector> checkedCons;
+		std::list<BLOCKMOD::Connector> checkedCons;
 		// remove invalid connections and fix any connectors that might miss a bit
 		for (BLOCKMOD::Connector & con : n.m_connectors) {
 			try {
 				n.adjustConnector(con);
-				checkedCons.append(con);
+				checkedCons.push_back(con);
 			}
 			catch (...) {}
 		}

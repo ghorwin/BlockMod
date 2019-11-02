@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 		// add an outlet socket - bottom
 		b.m_sockets.append( BLOCKMOD::Socket("T_out4", QPointF(6*GX, b.m_size.height()), Qt::Vertical, false) );
 
-		network.m_blocks.append(b);
+		network.m_blocks.push_back(b);
 	}
 	{
 		BLOCKMOD::Block b;
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
 		BLOCKMOD::Socket s4("T_in4", QPointF(4*GX, b.m_size.height()), Qt::Vertical, true);
 		b.m_sockets.append(s4);
 
-		network.m_blocks.append(b);
+		network.m_blocks.push_back(b);
 	}
 
 	// now create connectors between the various blocks and sockets
@@ -96,13 +96,13 @@ int main(int argc, char *argv[]) {
 	con.m_targetSocket = "Block2.T_in3";
 	con.m_segments.append( BLOCKMOD::Connector::Segment(Qt::Horizontal, 0));
 	con.m_segments.append( BLOCKMOD::Connector::Segment(Qt::Vertical, 0));
-	network.m_connectors.append(con);
+	network.m_connectors.push_back(con);
 
 	con.m_name = "Con2";
 	con.m_sourceSocket = "Block1.T_out4";
 	con.m_targetSocket = "Block2.T_in2";
 	con.m_segments.clear();
-	network.m_connectors.append(con);
+	network.m_connectors.push_back(con);
 
 	network.adjustConnectors();
 
