@@ -63,7 +63,12 @@ public:
 	*/
 	void setNetwork(const Network & network);
 
-	/*! Provide read-only access to the network data structure. */
+	/*! Provide read-only access to the network data structure.
+		\note This data structure is internally used and modified by user actions.
+		So, whenever a change signal is emitted, this network contains
+		already the changes. If you need to create UNDO actions based on the previous
+		state of the network, you must keep a separate copy of the network.
+	*/
 	const Network & network() const;
 
 
@@ -175,7 +180,7 @@ public:
 		Index must be a valid, otherwise an exception is thrown.
 		Also removes any connections made to this block.
 	*/
-	void removeBlock(int blockIndex);
+	void removeBlock(unsigned int blockIndex);
 
 	/*! Removes connector by giving a pointer to a connector in the managed network.
 		Connector must be stored in the network's connector list.
@@ -185,7 +190,7 @@ public:
 	/*! Removes connector with given index.
 		Index must be a valid, otherwise an exception is thrown.
 	*/
-	void removeConnector(int connectorIndex);
+	void removeConnector(unsigned int connectorIndex);
 
 
 

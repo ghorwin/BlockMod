@@ -184,17 +184,15 @@ void ZoomMeshGraphicsView::enterEvent(QEvent *event) {
 
 	SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
 	if (sceneManager) {
-		if (sceneManager->isConnectionModeEnabled())
+		if (sceneManager->isConnectionModeEnabled() && (QApplication::overrideCursor() == nullptr || QApplication::overrideCursor()->shape() != Qt::CrossCursor))
 			QApplication::setOverrideCursor(Qt::CrossCursor);
-		else
-			QApplication::setOverrideCursor(Qt::ArrowCursor);
 	}
 	QGraphicsView::enterEvent(event);
 }
 
 
 void ZoomMeshGraphicsView::leaveEvent(QEvent *event) {
-	QApplication::setOverrideCursor(Qt::ArrowCursor);
+	QApplication::restoreOverrideCursor();
 	QGraphicsView::leaveEvent(event);
 }
 

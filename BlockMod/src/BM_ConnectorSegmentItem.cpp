@@ -125,7 +125,7 @@ void ConnectorSegmentItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 	if (sceneManager && sceneManager->isConnectionModeEnabled())
 		return;
 
-	QApplication::setOverrideCursor(Qt::ArrowCursor);
+	QApplication::restoreOverrideCursor();
 	// mark all connector segments in this line with a different color or bold
 	if (sceneManager != nullptr)
 		sceneManager->highlightConnectorSegments(*m_connector, false);

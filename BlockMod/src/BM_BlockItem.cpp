@@ -137,24 +137,48 @@ void BlockItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * optio
 		return; // nothing to be drawn
 	painter->save();
 	painter->setRenderHint(QPainter::Antialiasing, true);
-	QLinearGradient grad(QPointF(0,0), QPointF(rect().width(),0));
-	if (option->state & QStyle::State_Selected) {
-		painter->setPen(QPen(QBrush(QColor(0,128,0)), 1.5));
-		grad.setColorAt(0, QColor(230,255,230));
-		grad.setColorAt(1, QColor(200,240,180));
+	if (m_block->m_properties.contains("ShowPixmap") &&
+		m_block->m_properties["ShowPixmap"].toBool() &&
+		m_block->m_properties.contains("Pixmap"))
+	{
+		// fill entire background with white
+		QRectF r = rect();
+		painter->setBrush(Qt::white);
+		painter->fillRect(r, QBrush(Qt::white));
+
+		// adjust area for pixmap
+		QFontMetrics fm(painter->font());
+		r.setTop(r.top()+4+fm.lineSpacing());
+		QPixmap p = m_block->m_properties["Pixmap"].value<QPixmap>();
+		painter->drawPixmap(r, p, p.rect());
+		painter->setPen( Qt::black );
+		painter->setBrush(Qt::NoBrush);
+		painter->drawRect(rect());
+		// now draw the label of the block
+		r = rect();
+		r.moveTop(4);
+		painter->drawText(r, Qt::AlignTop | Qt::AlignHCenter, m_block->m_name);
 	}
 	else {
-		grad.setColorAt(0, QColor(196,196,255));
-		grad.setColorAt(1, QColor(220,220,255));
+		QLinearGradient grad(QPointF(0,0), QPointF(rect().width(),0));
+		if (option->state & QStyle::State_Selected) {
+			painter->setPen(QPen(QBrush(QColor(0,128,0)), 1.5));
+			grad.setColorAt(0, QColor(230,255,230));
+			grad.setColorAt(1, QColor(200,240,180));
+		}
+		else {
+			grad.setColorAt(0, QColor(196,196,255));
+			grad.setColorAt(1, QColor(220,220,255));
+		}
+		painter->setBrush(grad);
+		painter->fillRect(rect(), grad);
+		painter->setPen( Qt::black );
+		painter->drawRect(rect());
+		// now draw the label of the block
+		QRectF r = rect();
+		r.moveTop(4);
+		painter->drawText(r, Qt::AlignTop | Qt::AlignHCenter, m_block->m_name);
 	}
-	painter->setBrush(grad);
-	painter->fillRect(rect(), grad);
-	painter->setPen( Qt::black );
-	painter->drawRect(rect());
-	// now draw the label of the block
-	QRectF r = rect();
-	r.moveTop(4);
-	painter->drawText(r, Qt::AlignTop | Qt::AlignHCenter, m_block->m_name);
 	painter->restore();
 }
 

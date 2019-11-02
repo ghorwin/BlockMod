@@ -77,15 +77,15 @@ void SceneManager::setNetwork(const Network & network) {
 	m_blockConnectorMap.clear();
 
 	// create new graphics items
-	for (int i=0; i<m_network->m_blocks.count(); ++i) {
-		BlockItem * item = createBlockItem( m_network->m_blocks[i] );
+	for (Block & b : m_network->m_blocks) {
+		BlockItem * item = createBlockItem( b );
 		addItem(item);
 		m_blockItems.append(item);
 	}
 
 	// create new graphics items for connectors
-	for (int i=0; i<m_network->m_connectors.count(); ++i) {
-		QList<ConnectorSegmentItem *> newConns = createConnectorItems(m_network->m_connectors[i]);
+	for (Connector & c : m_network->m_connectors) {
+		QList<ConnectorSegmentItem *> newConns = createConnectorItems(c);
 		for( BLOCKMOD::ConnectorSegmentItem * item : newConns) {
 			addItem(item);
 			m_connectorSegmentItems.append(item);
@@ -119,6 +119,15 @@ void SceneManager::blockMoved(const Block * block, const QPointF oldPos) {
 		// update corresponding connectorItems (maybe remove/add items)
 		updateConnectorSegmentItems(*con, nullptr);
 	}
+
+	// Mind the following problem:
+	// - this function is called from within BlockItem::itemChange() event handler
+	// - when you set a new network in the scene manager, for example in the slot connected
+	//	to networkGeometryChanged(), this will delete all existing block items and create new ones
+	// - when the execution returns from this function, it accesses now invalid memory --> boom!
+
+	// Rule: never ever call setNetwork() when processing this signal!
+
 	emit networkGeometryChanged(); /// \todo add old position to signal
 }
 
@@ -250,7 +259,7 @@ void SceneManager::mergeConnectorSegments(Connector & con) {
 	}
 	if (updateSegments)
 		updateConnectorSegmentItems(con, nullptr);
-	QApplication::setOverrideCursor(Qt::ArrowCursor);
+	QApplication::restoreOverrideCursor();
 }
 
 
@@ -310,11 +319,11 @@ void SceneManager::disableConnectionMode() {
 	}
 
 	// remove our artifical block and block item, if it exists
-	if (!m_network->m_blocks.isEmpty() && m_network->m_blocks.back().m_name  == Globals::InvisibleLabel)
-		removeBlock(m_network->m_blocks.count()-1);
+	if (!m_network->m_blocks.empty() && m_network->m_blocks.back().m_name  == Globals::InvisibleLabel)
+		removeBlock(m_network->m_blocks.size()-1);
 
 	m_connectionModeEnabled = false;
-	QApplication::setOverrideCursor(Qt::ArrowCursor);
+	QApplication::restoreOverrideCursor();
 }
 
 
@@ -348,7 +357,7 @@ void SceneManager::startSocketConnection(const SocketItem & outletSocketItem, co
 	dummySocket.m_pos = QPointF(0,0);
 	dummyBlock.m_sockets.append(dummySocket);
 
-	m_network->m_blocks.append(dummyBlock); // does not invalidate block pointers!
+	m_network->m_blocks.push_back(dummyBlock); // does not invalidate block pointers!
 
 	QString targetSocketName = dummyBlock.m_name + "." + dummySocket.m_name;
 
@@ -357,7 +366,7 @@ void SceneManager::startSocketConnection(const SocketItem & outletSocketItem, co
 	con.m_name = Globals::InvisibleLabel; // "Mich gibt's erst recht nicht";
 	con.m_sourceSocket = startSocketName;
 	con.m_targetSocket = targetSocketName;
-	m_network->m_connectors.append(con);
+	m_network->m_connectors.push_back(con);
 
 	// now create block item and connector items
 	BlockItem * bi = createBlockItem(m_network->m_blocks.back()); // Mind: always pass the object in the m_block list
@@ -414,7 +423,7 @@ const Connector * SceneManager::selectedConnector() const {
 
 
 void SceneManager::addBlock(const Block & block) {
-	m_network->m_blocks.append(block);
+	m_network->m_blocks.push_back(block);
 	BlockItem * item = createBlockItem( m_network->m_blocks.back() );
 	addItem(item);
 	m_blockItems.append(item);
@@ -442,39 +451,38 @@ void SceneManager::addConnector(const Connector & con) {
 	// check, if inlet socket is already connected to
 	if (isConnectedSocket(b2, s2))
 		throw std::runtime_error("[SceneManager::addConnector] Invalid target socket (has already an incoming connection).");
-	m_network->m_connectors.append(con);
+	m_network->m_connectors.push_back(con);
 	m_network->adjustConnector(m_network->m_connectors.back());
 }
 
 
 void SceneManager::removeBlock(const Block * block) {
-	int idx = 0;
-	for (;idx<m_network->m_blocks.count(); ++idx)
-		if (block == &m_network->m_blocks[idx])
+	size_t idx = 0;
+	for (auto bit = m_network->m_blocks.begin(); bit != m_network->m_blocks.end(); ++bit, ++idx)
+		if (block == &(*bit))
 			break;
-	if (idx == m_network->m_blocks.count())
+	if (idx == m_network->m_blocks.size())
 		throw std::runtime_error("[SceneManager::removeBlock] Invalid pointer (not in managed network)");
 	removeBlock(idx);
 }
 
 
-void SceneManager::removeBlock(int blockIndex) {
-	Q_ASSERT(m_network->m_blocks.count() > blockIndex);
+void SceneManager::removeBlock(unsigned int blockIndex) {
+	Q_ASSERT(m_network->m_blocks.size() > blockIndex);
 	Q_ASSERT(m_blockItems.count() > blockIndex);
 
-	Block * blockToBeRemoved = &m_network->m_blocks[blockIndex];
+	auto bit = m_network->m_blocks.begin(); std::advance(bit, blockIndex);
+	Block * blockToBeRemoved = &(*bit);
 
 	// find connectors that connect to this block
 	QSet<Connector*> connectors = m_blockConnectorMap[blockToBeRemoved];
 	for (Connector * con : connectors) {
-		// get index of connector
-		int i=0;
-		while (i < m_network->m_connectors.count()) {
-			if (&m_network->m_connectors[i] == con) {
-				m_network->m_connectors.removeAt(i);
-				continue;
+		// find connector to be removed from list
+		for (auto cit = m_network->m_connectors.begin(); cit != m_network->m_connectors.end(); ++cit) {
+			if (&(*cit) == con) {
+				m_network->m_connectors.erase(cit);
+				break;
 			}
-			++i;
 		}
 	}
 
@@ -483,7 +491,8 @@ void SceneManager::removeBlock(int blockIndex) {
 	m_blockItems.removeAt(blockIndex);
 	delete bi;
 
-	m_network->m_blocks.removeAt(blockIndex);
+	// finally remove block itself from list
+	m_network->m_blocks.erase(bit);
 
 	// and update all connector items; first remove all, then recreate as needed
 	qDeleteAll(m_connectorSegmentItems); // will be recreated
@@ -496,20 +505,21 @@ void SceneManager::removeBlock(int blockIndex) {
 
 
 void SceneManager::removeConnector(const Connector * con) {
-	int idx = 0;
-	for (;idx<m_network->m_connectors.count(); ++idx)
-		if (con == &m_network->m_connectors[idx])
+	size_t idx = 0;
+	for (auto cit = m_network->m_connectors.begin(); cit != m_network->m_connectors.end(); ++cit, ++idx)
+		if (con == &(*cit))
 			break;
-	if (idx == m_network->m_connectors.count())
+	if (idx == m_network->m_connectors.size())
 		throw std::runtime_error("[SceneManager::removeConnector] Invalid pointer (not in managed network)");
 	removeConnector(idx);
 }
 
 
-void SceneManager::removeConnector(int connectorIndex) {
-	Q_ASSERT(m_network->m_connectors.count() > connectorIndex);
+void SceneManager::removeConnector(unsigned int connectorIndex) {
+	Q_ASSERT(m_network->m_connectors.size() > connectorIndex);
 
-	Connector * conToBeRemoved = &m_network->m_connectors[connectorIndex];
+	auto cit = m_network->m_connectors.begin(); std::advance(cit, connectorIndex);
+	Connector * conToBeRemoved = &(*cit);
 
 	// find corresponding connector items
 	int i=0;
@@ -529,7 +539,7 @@ void SceneManager::removeConnector(int connectorIndex) {
 	}
 
 	// finally remove connector at given index
-	m_network->m_connectors.removeAt(connectorIndex);
+	m_network->m_connectors.erase(cit);
 
 }
 
@@ -628,7 +638,7 @@ void SceneManager::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 			con.m_name = "new connector";
 			con.m_sourceSocket = startSocket;
 			con.m_targetSocket = targetSocket;
-			m_network->m_connectors.append(con);
+			m_network->m_connectors.push_back(con);
 			m_network->adjustConnector(m_network->m_connectors.back());
 			updateConnectorSegmentItems(m_network->m_connectors.back(), nullptr);
 			emit newConnectionAdded();

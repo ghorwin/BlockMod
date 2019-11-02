@@ -41,6 +41,8 @@ class QString;
 #include <QPointF>
 #include <QList>
 #include <QXmlStreamReader>
+
+#include <list>
 #include <stdexcept>
 
 namespace BLOCKMOD {
@@ -130,6 +132,29 @@ void readList(QXmlStreamReader & reader, QList<T> & typeList) {
 			if (reader.hasError())
 				break;
 			typeList.append(tmp);
+		}
+		else if (reader.isEndElement()) {
+			break; // done with type list
+		}
+	}
+}
+
+// templated function that works with all types of lists
+template <typename T>
+void readList(QXmlStreamReader & reader, std::list<T> & typeList) {
+	// then read all the subsections
+	int count = 0;
+	while (!reader.atEnd() && !reader.hasError()) {
+		reader.readNext();
+		// process elements and attributes
+		if (reader.isStartElement()) {
+			++count;
+			// start reading the type
+			T tmp;
+			tmp.readXML(reader);
+			if (reader.hasError())
+				break;
+			typeList.push_back(tmp);
 		}
 		else if (reader.isEndElement()) {
 			break; // done with type list
