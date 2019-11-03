@@ -39,6 +39,7 @@
 #include <QDebug>
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
+#include <QTimer>
 
 #include <iostream>
 
@@ -110,7 +111,7 @@ const BlockItem * SceneManager::blockItemByName(const QString & blockName) const
 }
 
 
-void SceneManager::blockMoved(const Block * block, const QPointF oldPos) {
+void SceneManager::blockMoved(const Block * block, const QPointF /*oldPos*/) {
 	// lookup connected connectors
 	QSet<Connector *> & cons = m_blockConnectorMap[block];
 	// adjust connectors to new block positions
@@ -469,7 +470,7 @@ void SceneManager::removeBlock(const Block * block) {
 
 void SceneManager::removeBlock(unsigned int blockIndex) {
 	Q_ASSERT(m_network->m_blocks.size() > blockIndex);
-	Q_ASSERT(m_blockItems.count() > blockIndex);
+	Q_ASSERT(m_blockItems.count() > (int)blockIndex);
 
 	auto bit = m_network->m_blocks.begin(); std::advance(bit, blockIndex);
 	Block * blockToBeRemoved = &(*bit);
@@ -487,8 +488,8 @@ void SceneManager::removeBlock(unsigned int blockIndex) {
 	}
 
 	// now remove the block itself
-	BlockItem * bi = m_blockItems[blockIndex];
-	m_blockItems.removeAt(blockIndex);
+	BlockItem * bi = m_blockItems[(int)blockIndex];
+	m_blockItems.removeAt((int)blockIndex);
 	delete bi;
 
 	// finally remove block itself from list

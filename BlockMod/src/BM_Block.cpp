@@ -139,8 +139,8 @@ QLineF Block::socketStartLine(const Socket * socket) const {
 
 void Block::findSocketInsertPosition(bool inletSocket, int & x, int & y) const {
 	// create list of socket positions
-	int rowCount = std::floor(m_size.height() / (double)Globals::GridSpacing + 0.5);
-	int colCount = std::floor(m_size.width() / (double)Globals::GridSpacing + 0.5);
+	unsigned int rowCount = (unsigned int)std::floor(m_size.height() / (double)Globals::GridSpacing + 0.5);
+	unsigned int colCount = (unsigned int)std::floor(m_size.width() / (double)Globals::GridSpacing + 0.5);
 
 	std::vector<int> verticalSockets(rowCount-1, 0);
 	std::vector<int> horizontalSockets(colCount-1, 0);
@@ -151,13 +151,13 @@ void Block::findSocketInsertPosition(bool inletSocket, int & x, int & y) const {
 			// determine position of the socket, and mark slot as taken
 			if (s->m_pos.y() == 0.0) {
 				// located at top
-				int colrowIdx = std::floor(s->m_pos.x() / (double)Globals::GridSpacing + 0.5);
+				unsigned int colrowIdx = (unsigned int)(std::floor(s->m_pos.x() / (double)Globals::GridSpacing + 0.5));
 				// if 0 or > colCount-1, ignore
 				if (colrowIdx > 0 && colrowIdx < colCount-1)
 					horizontalSockets[colrowIdx] = 1;
 			}
 			else {
-				int rowIdx = std::floor(s->m_pos.y() / (double)Globals::GridSpacing + 0.5);
+				unsigned int rowIdx = (unsigned int)(std::floor(s->m_pos.y() / (double)Globals::GridSpacing + 0.5));
 				if (rowIdx > 0 && rowIdx < rowCount-1)
 					verticalSockets[rowIdx] = 1;
 			}
@@ -187,8 +187,8 @@ void Block::findSocketInsertPosition(bool inletSocket, int & x, int & y) const {
 
 void Block::unusedSocketSpots(QList<int> & leftSockets, QList<int> & topSockets, QList<int> & rightSockets, QList<int> & bottomSockets) {
 	// create list of socket positions
-	int rowCount = std::floor(m_size.height() / (double)Globals::GridSpacing + 0.5);
-	int colCount = std::floor(m_size.width() / (double)Globals::GridSpacing + 0.5);
+	int rowCount = (int)std::floor(m_size.height() / (double)Globals::GridSpacing + 0.5);
+	int colCount = (int)std::floor(m_size.width() / (double)Globals::GridSpacing + 0.5);
 
 	leftSockets.clear();
 	rightSockets.clear();
@@ -206,29 +206,29 @@ void Block::unusedSocketSpots(QList<int> & leftSockets, QList<int> & topSockets,
 
 	// now process all sockets
 	for (const Socket & s : m_sockets) {
-		int colIdx = std::floor(s.m_pos.x() / (double)Globals::GridSpacing + 0.5);
-		int rowIdx = std::floor(s.m_pos.y() / (double)Globals::GridSpacing + 0.5);
+		int colIdx = (int)std::floor(s.m_pos.x() / (double)Globals::GridSpacing + 0.5);
+		int rowIdx = (int)std::floor(s.m_pos.y() / (double)Globals::GridSpacing + 0.5);
 
 		// left side?
-		if (s.m_pos.x() == 0.0) {
+		if ((int)s.m_pos.x() == 0) {
 			if (rowIdx > 0 && rowIdx < rowCount)
 				++leftSockets[rowIdx];
 		}
 
 		// right side?
-		if (s.m_pos.x() == m_size.width()) {
+		if ((int)s.m_pos.x() == (int)m_size.width()) {
 			if (rowIdx > 0 && rowIdx < rowCount)
 				++rightSockets[rowIdx];
 		}
 
 		// top size
-		if (s.m_pos.y() == 0.0) {
+		if ((int)s.m_pos.y() == 0) {
 			if (colIdx > 0 && colIdx < colCount)
 				++topSockets[colIdx];
 		}
 
 		// bottom size
-		if (s.m_pos.y() == m_size.height()) {
+		if ((int)s.m_pos.y() == (int)m_size.height()) {
 			if (colIdx > 0 && colIdx < colCount)
 				++bottomSockets[colIdx];
 		}
@@ -237,10 +237,6 @@ void Block::unusedSocketSpots(QList<int> & leftSockets, QList<int> & topSockets,
 
 
 void Block::autoUpdateSockets(const QStringList & inletSockets, const QStringList & outletSockets) {
-	// determine number of block grid lines
-	int rowCount = std::floor(m_size.height() / (double)Globals::GridSpacing + 0.5);
-	int colCount = std::floor(m_size.width() / (double)Globals::GridSpacing + 0.5);
-
 	// now remove no-longer existing sockets and add and position new sockets
 
 	// first remove all sockets from block that are not in the list of inlet/outlet sockets

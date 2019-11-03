@@ -42,7 +42,7 @@ class QString;
 #include <QList>
 #include <QXmlStreamReader>
 
-#include <list>
+#include <vector>
 #include <stdexcept>
 
 namespace BLOCKMOD {
