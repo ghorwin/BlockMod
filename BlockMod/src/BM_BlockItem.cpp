@@ -111,6 +111,13 @@ void BlockItem::resize(int newWidth, int newHeight) {
 }
 
 
+QRectF BlockItem::boundingRect() const {
+	QRectF r = QGraphicsRectItem::boundingRect();
+	/// \todo Later, if we draw text annotations outside the rectangle, adjust the bounding rect here
+	return r;
+}
+
+
 // *** protected functions ***
 
 
@@ -198,34 +205,43 @@ void BlockItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 
 
 QVariant BlockItem::itemChange(GraphicsItemChange change, const QVariant & value) {
-	if (change == QGraphicsItem::ItemPositionChange) {
-		SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+	switch (change) {
+		case QGraphicsItem::ItemPositionChange : {
+			SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
 
-		// snap to grid
-		QPointF pos = value.toPointF();
+			// snap to grid
+			QPointF pos = value.toPointF();
 
-		// apply true rounding
-		pos.setX( std::floor((pos.x()+0.5*Globals::GridSpacing) / Globals::GridSpacing) * Globals::GridSpacing);
-		pos.setY( std::floor((pos.y()+0.5*Globals::GridSpacing) / Globals::GridSpacing) * Globals::GridSpacing);
-		if (m_block->m_pos != pos.toPoint()) {
-			m_moved = true;
-			QPointF oldPos = m_block->m_pos;
-			m_block->m_pos = pos.toPoint();
-			// inform network to update connectors
-			if (sceneManager != nullptr)
-				sceneManager->blockMoved(m_block, oldPos);
-		}
-		// notify scene of changed scene rect
-		if (sceneManager == nullptr)
+			// apply true rounding
+			pos.setX( std::floor((pos.x()+0.5*Globals::GridSpacing) / Globals::GridSpacing) * Globals::GridSpacing);
+			pos.setY( std::floor((pos.y()+0.5*Globals::GridSpacing) / Globals::GridSpacing) * Globals::GridSpacing);
+			if (m_block->m_pos != pos.toPoint()) {
+				m_moved = true;
+				QPointF oldPos = m_block->m_pos;
+				m_block->m_pos = pos.toPoint();
+				// inform network to update connectors
+				if (sceneManager != nullptr)
+					sceneManager->blockMoved(m_block, oldPos);
+			}
+			// notify scene of changed scene rect
+			if (sceneManager == nullptr)
+				return pos;
+			QRectF srect = sceneManager->sceneRect();
+			if (pos.x() < srect.left() || pos.y() < srect.top() ||
+				(pos.x() + rect().width()) > srect.right() ||
+				(pos.y() + rect().height()) > srect.bottom())
+			{
+				sceneManager->setSceneRect( QRectF()); // tell scene to recompute scene rect
+			}
 			return pos;
-		QRectF srect = sceneManager->sceneRect();
-		if (pos.x() < srect.left() || pos.y() < srect.top() ||
-			(pos.x() + rect().width()) > srect.right() ||
-			(pos.y() + rect().height()) > srect.bottom())
-		{
-			sceneManager->setSceneRect( QRectF()); // tell scene to recompute scene rect
 		}
-		return pos;
+
+		case QGraphicsItem::ItemSelectedHasChanged : {
+			SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+			if (value.toBool())
+				sceneManager->blockSelected(m_block);
+		} break;
+		default :;
 	}
 	return QGraphicsRectItem::itemChange(change, value);
 }

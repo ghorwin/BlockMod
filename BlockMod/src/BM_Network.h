@@ -64,6 +64,12 @@ public:
 	/*! Flattens all ID names of sockets and blocks and checks for duplicates. */
 	void checkNames() const;
 
+	/*! Tests, if the network has a block with a socket, both identified by socketVariableName in format
+		"<block>.<socketName>" and if this socket is an inlet socket or outlet socket (depending on inletSocket parameter).
+		Returns true, if such a socket exists.
+	*/
+	bool haveSocket(const QString & socketVariableName, bool inletSocket) const;
+
 
 
 	/*! Processes all connectors and updates their segments so that start/end sockets are connected. */
@@ -84,6 +90,7 @@ public:
 
 	/*! Renames a single block. */
 	void renameBlock(unsigned int blockIdx, const QString & newName);
+
 
 	// *** member variables ***
 

@@ -85,6 +85,11 @@ public:
 	*/
 	void blockMoved(const Block * block, const QPointF oldPos);
 
+	/*! Calls from BlockItem when a block was moved.
+		Results in blockSelected(blockName) to be emitted.
+	*/
+	void blockSelected(const Block * block);
+
 	/*! Called from ConnectorSegmentItem when a segment was moved to signal the scene manager
 		to adjust the connected connectors.
 		\param currentItem Pointer to the item currently being moved. It's socket index is
@@ -202,6 +207,9 @@ signals:
 
 	/*! Emitted whenever a block action was triggered (usually by double-clicking on the block). */
 	void blockActionTriggered(const BlockItem * blockItem);
+
+	/*! Emitted, when a block was selected. */
+	void newBlockSelected(const QString & blockName);
 
 	/*! Emitted when a block or connector has been moved. */
 	void networkGeometryChanged();

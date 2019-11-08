@@ -73,6 +73,7 @@ void ConnectorSegmentItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 	if (m_isHighlighted) {
 		QPen p;
 		p.setWidthF(2);
+		p.setStyle(Qt::SolidLine);
 		p.setColor(QColor(0,0,110));
 		if (isSelected()) {
 			p.setColor(QColor(192,0,0));
@@ -83,8 +84,9 @@ void ConnectorSegmentItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 	}
 	else {
 		QPen p;
-		p.setWidthF(1);
+		p.setWidthF(0.8);
 		p.setColor(Qt::black);
+		p.setStyle(Qt::SolidLine);
 		if (isSelected()) {
 			p.setWidthF(2);
 			p.setColor(QColor(192,0,0));

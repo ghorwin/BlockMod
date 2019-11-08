@@ -83,7 +83,32 @@ void SocketItem::updateSocketItem() {
 
 
 QRectF SocketItem::boundingRect() const {
-	return m_symbolRect;
+	QRectF r = m_symbolRect;
+	// add space for text
+	QFont f;
+	f.setPointSizeF(Globals::LabelFontSize);
+	QFontMetricsF metrics(f);
+	QRectF textBoundingRect = metrics.boundingRect(m_socket->m_name);
+	textBoundingRect.setWidth(textBoundingRect.width()+6); // add some space to avoid clipping of italic fonts to the right
+
+	switch (m_socket->direction()) {
+		case Socket::Left		:
+			// left side - expand rect to left
+			r.moveLeft(r.left()-textBoundingRect.width()-6);
+		break;
+		case Socket::Right		:
+			// right side - expand rect to right
+			r.setWidth(r.width()+textBoundingRect.width()+6);
+		break;
+		case Socket::Top		:
+			// top side - move top
+			r.moveTop(r.top()-textBoundingRect.width()-6);
+		break;
+		case Socket::Bottom		:
+			r.setHeight(r.height() + textBoundingRect.width()+6);
+		break;
+	}
+	return r;
 }
 
 

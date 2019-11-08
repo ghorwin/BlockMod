@@ -195,6 +195,22 @@ void Network::checkNames() const {
 }
 
 
+bool Network::haveSocket(const QString & socketVariableName, bool inletSocket) const {
+	QString blockName, socketName;
+	splitFlatName(socketVariableName, blockName, socketName);
+	for (const BLOCKMOD::Block & b : m_blocks) {
+		if (b.m_name == blockName) {
+			for (const BLOCKMOD::Socket & s : b.m_sockets) {
+				if (s.m_name == socketName && (s.m_inlet == inletSocket)) {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+
 void Network::adjustConnectors() {
 	for (Connector & c : m_connectors) {
 		try {
