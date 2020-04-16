@@ -4,6 +4,8 @@ First take a look at the following animation, which illustrates some of the basi
 
 ![](BlockMod/doc/Functionality_2019-08-28.gif)
 
+MasterSim (https://sourceforge.net/projects/mastersim) is an application that uses BlockMod. Here you can see some of the more advanced usage and also get ideas about data management.
+
 ## Goals, Vision and Design Requirements
 
 Block-based networks are needed for quite a few applications. When developing such an application, where users are allowed to create their own networks, you may need the following functionality:
