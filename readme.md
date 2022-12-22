@@ -4,7 +4,7 @@ First take a look at the following animation, which illustrates some of the basi
 
 ![](BlockMod/doc/Functionality_2019-08-28.gif)
 
-MasterSim (https://sourceforge.net/projects/mastersim) is an application that uses BlockMod. Here you can see some of the more advanced usage and also get ideas about data management.
+MasterSim (https://github.com/ghorwin/MasterSim) is an application that uses BlockMod. Here you can see some of the more advanced usage and also get ideas about data management.
 
 ## Goals, Vision and Design Requirements
 
@@ -59,7 +59,7 @@ Customizability:
 - CTRL + left click - select multiple blocks (but only one connector can be selected at a time!)
 - click and hold left mouse button and drag item - move blocks and connector segments
 
-When in connection mode (started with API call, see below):
+When in connection mode (started with a click on an outlet socket, see below):
 
 - hovering over outlet socket with highlight the socket
 - click and hold left mouse button on outlet socket will start a new connection
@@ -150,9 +150,7 @@ Use ```SceneManager::removeConnector(...)``` to remove an existing connector.
 
 ### Starting connection mode
 
-In _connection mode_ the scene shows a cross mouse cursor and allows new connections to be made between outlet and inlet sockets.
-
-Call ```SceneManager::enableConnectionMode()``` to put the scene into connection mode.
+_Connection mode_ is started when the user clicks and drags away from an outlet socket. Then, the scene shows a cross mouse cursor and allows new connections to be made to an unoccupied inlet socket.
 
 # Implementation
 
@@ -189,3 +187,10 @@ Data members/objects refer to each other via pointer links. Care has to be taken
 Note: when any of the vectors of the network's data structures change, the memory location of these blocks/connectors may become invalid. Graphics items still pointing to that memory may cause access violations. Thus, any change of network's data structures must yield an update of the respective Graphics items.
 
 Hence, the scene manager also handles any changes to the underlying data structures and provides functions for adding/removing blocks, connectors, sockets etc.
+
+
+# Releases
+
+Just clone the repo and either use Qt Creator/Qmake to build library and demos, or use CMake with the CMakeLists.txt within the `BlockMod` subdirectory.
+This CMakeLists.txt is also suited to create deb/rpm packages.
+
