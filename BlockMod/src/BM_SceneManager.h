@@ -71,6 +71,10 @@ public:
 	*/
 	const Network & network() const;
 
+	/*! Generates a pixmap from the current scene rect.
+		Aspect ratio is kept, and the image is fitted into the selected target size.
+	*/
+	QPixmap generatePixmap(QSize targetSize);
 
 	// query functions
 
@@ -123,22 +127,12 @@ public:
 	/*! Quick test if a socket is connected anywhere by a connector. */
 	bool isConnectedSocket(const Block * b, const Socket * s) const;
 
-
-	// Functions related to connection mode
-
-	/*! Puts the scene into connection mode.
-		This turns on the hover-effect on outlet sockets which now start a connection upon click.
-		Also, block and connector movement is disabled.
+	/*! Returns true, if the user currently drags a connection.
+		In this case, the hover effects for moving connectors/blocks are disabled.
 	*/
-	void enableConnectionMode();
+	bool isCurrentlyConnecting() const { return m_currentlyConnecting; }
 
-	/*! Turns of the connection mode. */
-	void disableConnectionMode();
-
-	/*! Returns true, if scene is currently in connection mode. */
-	bool isConnectionModeEnabled() const { return m_connectionModeEnabled; }
-
-	/*! Called from a socket item, so that the scene is put into connection mode.
+	/*! Called from a socket item, so that the scene is put into "actively connecting" mode.
 		This means:
 		- a virtual (invisible) block is created with a single inlet connector, the start line
 			of this invisible block has zero length.
@@ -147,6 +141,12 @@ public:
 		- all outlet sockets are marked as not highlightable
 	*/
 	void startSocketConnection(const SocketItem & outletSocketItem, const QPointF & mousePos);
+
+	/*! Finishes "actively connecting" mode and puts the scene back into regular modification mode.
+		This function is called when a connection was made, or the mouse button was released without reaching an
+		outlet connector. Removes our artificial connection block.
+	*/
+	void finishConnection();
 
 
 	// functions to query current selection
@@ -198,7 +198,6 @@ public:
 	void removeConnector(unsigned int connectorIndex);
 
 
-
 signals:
 	/*! Emitted when a new connection was made and a connector was added.
 		The new connector is added to the end of the connectors in the network.
@@ -206,13 +205,19 @@ signals:
 	void newConnectionAdded();
 
 	/*! Emitted whenever a block action was triggered (usually by double-clicking on the block). */
-	void blockActionTriggered(const BlockItem * blockItem);
+	void blockActionTriggered(const BLOCKMOD::BlockItem * blockItem);
 
 	/*! Emitted, when a block was selected. */
 	void newBlockSelected(const QString & blockName);
 
+	/*! Emitted, when a connector was selected. */
+	void newConnectorSelected(const QString & sourceSocketName, const QString & targetSocketName);
+
 	/*! Emitted when a block or connector has been moved. */
 	void networkGeometryChanged();
+
+	/*! Emitted when the selection was cleared (by click on empty space in view). */
+	void selectionCleared();
 
 protected:
 	/*! Listens for right-mouse-button clicks that turn off connection mode. */
@@ -273,8 +278,8 @@ private:
 	*/
 	QMap<const Block*, QSet<Connector*> >	m_blockConnectorMap;
 
-	/*! If true, the scene is in connection mode and dragging of connectors/blocks is disabled. */
-	bool							m_connectionModeEnabled;
+	/*! If true, the we are currently dragging a connection line. */
+	bool							m_currentlyConnecting;
 
 };
 

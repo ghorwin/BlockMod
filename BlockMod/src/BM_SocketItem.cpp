@@ -52,8 +52,8 @@ namespace BLOCKMOD {
 
 SocketItem::SocketItem(BlockItem * parent, Socket * socket) :
 	QGraphicsItem (parent),
+	m_block(parent->block()),
 	m_socket(socket),
-	m_hoverEnabled(false),
 	m_hovered(false)
 {
 	updateSocketItem();
@@ -112,28 +112,33 @@ QRectF SocketItem::boundingRect() const {
 }
 
 
-void SocketItem::setHoverEnabled(bool enabled) {
-	if (enabled) {
-		m_hoverEnabled = true;
-	}
-	else {
-		m_hoverEnabled = false;
-		m_hovered = false;
-	}
-	update();
-}
-
-
 // *** protected functions ***
 
 void SocketItem::hoverEnterEvent (QGraphicsSceneHoverEvent *event) {
-	if (m_hoverEnabled)
-		m_hovered = true;
+	SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
+	// for outlet sockets, we allow hovering if:
+	// - scene is not currently in connecting mode
+
+	// for inlet sockets, we only allow hovering if:
+	// - scene is in connecting mode
+	// - socket is not yet occupied
+
+	if (sceneManager) {
+		if ( (!m_socket->m_inlet && !sceneManager->isCurrentlyConnecting()) ||
+			 (m_socket->m_inlet && sceneManager->isCurrentlyConnecting() && !sceneManager->isConnectedSocket(m_block, m_socket)) )
+		{
+			if (QApplication::overrideCursor() == nullptr)
+				QApplication::setOverrideCursor(Qt::CrossCursor);
+			m_hovered = true;
+		}
+	}
 	QGraphicsItem::hoverEnterEvent(event);
 }
 
 
 void SocketItem::hoverLeaveEvent (QGraphicsSceneHoverEvent *event) {
+	if (m_hovered)
+		QApplication::restoreOverrideCursor();
 	m_hovered = false;
 	QGraphicsItem::hoverLeaveEvent(event);
 }
@@ -287,12 +292,8 @@ void SocketItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opt
 
 
 void SocketItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-	// ignore clicks on inlet sockets
-	if (!m_hoverEnabled) {
-		event->ignore();
-		return;
-	}
 	// starting a connection?
+	// ignore clicks on inlet sockets
 	if (!m_socket->m_inlet) {
 		if (event->button() == Qt::LeftButton && event->modifiers() == Qt::NoModifier) {
 			SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());

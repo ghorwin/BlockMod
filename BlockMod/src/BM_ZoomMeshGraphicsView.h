@@ -49,6 +49,9 @@ class ZoomMeshGraphicsView : public QGraphicsView {
 public:
 	explicit ZoomMeshGraphicsView(QWidget *parent=0);
 
+	/*! Returns current zoom level. */
+	int zoomLevel() const { return m_zoomLevel; }
+
 public slots:
 
 	/*! Sets the color for the grid. */
@@ -65,9 +68,6 @@ public slots:
 
 	/*! Sets new zoom level. */
 	void setZoomLevel(int zoomLevel);
-
-	/*! Returns current zoom level. */
-	int zoomLevel() const { return m_zoomLevel; }
 
 	/*! Reset the zoom to 0. */
 	void resetZoom();

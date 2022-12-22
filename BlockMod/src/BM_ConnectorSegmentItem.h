@@ -81,6 +81,9 @@ protected:
 	*/
 	virtual QVariant itemChange(GraphicsItemChange change, const QVariant & value) override;
 
+	/*! Re-implements the shape of the line, making it wider for more convenient hovering/clicking */
+	QPainterPath shape() const override;
+
 private:
 	/*! Indicates, that the item has been moved. */
 	bool		m_moved;

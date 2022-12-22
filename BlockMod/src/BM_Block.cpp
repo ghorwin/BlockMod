@@ -80,6 +80,24 @@ void Block::readXML(QXmlStreamReader & reader) {
 			else if (ename == "Sockets") {
 				readList(reader, m_sockets);
 			}
+			else if (ename == "Properties") {
+				while (!reader.atEnd() && !reader.hasError()) {
+					reader.readNext();
+					if (reader.isStartElement()) {
+						QString ename = reader.name().toString();
+						if (ename == "ShowPixmap") {
+							QString val = readTextElement(reader);
+							if (val == "true")
+								m_properties["ShowPixmap"] = true;
+						}
+					}
+					else if (reader.isEndElement()) {
+						ename = reader.name().toString();
+						if (ename == "Properties")
+							break;// done with XML tag
+					}
+				}
+			}
 			else {
 				// unknown element, skip it and all its child elements
 				reader.raiseError(QString("Found unknown element '%1' in Block tag.").arg(ename));
@@ -107,6 +125,11 @@ void Block::writeXML(QXmlStreamWriter & writer) const {
 			m_sockets[i].writeXML(writer);
 
 		writer.writeEndElement(); // Sockets
+	}
+	if (m_properties.contains("ShowPixmap")) {
+		writer.writeStartElement("Properties");
+		writer.writeTextElement("ShowPixmap", m_properties.value("ShowPixmap").toBool() ? "true" : "false");
+		writer.writeEndElement(); // Properties
 	}
 
 	writer.writeEndElement();

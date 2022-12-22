@@ -6,6 +6,7 @@
 
 CONFIG			+= silent
 CONFIG			-= depend_includepath
+CONFIG			+= c++11
 
 CONFIG(release, debug|release) {
 #	message( "Setting NDEBUG define" )
@@ -34,18 +35,6 @@ contains( OPTIONS, sanitize_checks ) {
 }
 
 
-# check if 32 or 64 bit version and set prefix variable for using in output paths
-greaterThan(QT_MAJOR_VERSION, 4) {
-	contains(QT_ARCH, i386): {
-		DIR_PREFIX =
-	} else {
-		DIR_PREFIX = _x64
-	}
-} else {
-	DIR_PREFIX =
-}
-
-
 #
 # *** Applications ***
 #
@@ -56,31 +45,30 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 equals(TEMPLATE,app) {
 
 	CONFIG(debug, debug|release) {
-		OBJECTS_DIR = debug$${DIR_PREFIX}
-		DESTDIR = ../../../bin/debug$${DIR_PREFIX}
+		OBJECTS_DIR = debug
+		DESTDIR = ../bin/debug
 	}
 	else {
-		OBJECTS_DIR = release$${DIR_PREFIX}
-		DESTDIR = ../../../bin/release$${DIR_PREFIX}
+		OBJECTS_DIR = release
+		DESTDIR = ../bin/release
 	}
 
 	MOC_DIR = moc
 	UI_DIR = ui
 
 	win32-msvc* {
+		# disable warning for unsafe functions if using MS compiler
 		QMAKE_CXXFLAGS += /wd4996
 		QMAKE_CFLAGS += /wd4996
+		DEFINES += NOMINMAX
 		DEFINES += _CRT_SECURE_NO_WARNINGS
-	}
-	else {
-		QMAKE_CXXFLAGS += -std=c++11
-	}
 
-	QMAKE_LIBDIR += ../../../lib$${DIR_PREFIX}
-	LIBS += -L../../../lib$${DIR_PREFIX}
-
-	win32:LIBS += -liphlpapi
-	win32:LIBS += -lshell32
+		# In Debug mode add warnings for access to uninitialized variables
+		# and out-of-bounds access for static arrays (and vectors)
+		CONFIG(debug, debug|release) {
+			QMAKE_CXXFLAGS += /GS /RTC1
+		}
+	}
 }
 
 
@@ -103,56 +91,51 @@ equals(TEMPLATE,lib) {
 	MOC_DIR = moc
 	UI_DIR = ui
 
-# using of shared libs only for non MC compiler
-# MS compiler needs explicite export statements in case of shared libs
+	# using of shared libs only for non MC compiler
+	# MS compiler needs explicite export statements in case of shared libs
 	win32-msvc* {
 		CONFIG += static
 		DEFINES += NOMINMAX
+		# disable warning for unsafe functions if using MS compiler
+		QMAKE_CXXFLAGS += /wd4996
+		QMAKE_CFLAGS += /wd4996
 		DEFINES += _CRT_SECURE_NO_WARNINGS
+		# In Debug mode add warnings for access to uninitialized variables
+		# and out-of-bounds access for static arrays (and vectors)
 		CONFIG(debug, debug|release) {
 			QMAKE_CXXFLAGS += /GS /RTC1
 		}
 	}
 	else {
+		# on Unix/MacOS we always build our libraries as dynamic libs
 		CONFIG += shared
 	}
 
-	# disable warning for unsafe functions if using MS compiler
-	win32-msvc* {
-		QMAKE_CXXFLAGS += /wd4996
-		QMAKE_CFLAGS += /wd4996
-	}
-	else {
-		QMAKE_CXXFLAGS += -std=c++11
-	}
-
-	DESTDIR = ../../../lib$${DIR_PREFIX}
-	LIBS += -L../../../lib$${DIR_PREFIX}
+	DESTDIR = ../lib
+	LIBS += -L../lib
 
 	CONFIG(debug, debug|release) {
-		OBJECTS_DIR = debug$${DIR_PREFIX}
+		OBJECTS_DIR = debug
 		windows {
 			contains( OPTIONS, top_level_libs ) {
-				DLLDESTDIR = ../../../bin/debug$${DIR_PREFIX}
+				DLLDESTDIR = ../bin/debug
 			}
 			else {
-				DLLDESTDIR = ../../../../bin/debug$${DIR_PREFIX}
+				DLLDESTDIR = ../../bin/debug
 			}
 		}
 	}
 	else {
-		OBJECTS_DIR = release$${DIR_PREFIX}
+		OBJECTS_DIR = release
 		windows {
 			contains( OPTIONS, top_level_libs ) {
-				DLLDESTDIR = ../../../bin/release$${DIR_PREFIX}
+				DLLDESTDIR = ../bin/release
 			}
 			else {
-				DLLDESTDIR = ../../../../bin/release$${DIR_PREFIX}
+				DLLDESTDIR = ../../bin/release
 			}
 		}
 	}
 
-	win32:LIBS += -lshell32
-	win32:LIBS += -liphlpapi
 
 }

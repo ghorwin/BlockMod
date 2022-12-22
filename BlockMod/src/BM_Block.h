@@ -39,6 +39,7 @@
 #include <QPointF>
 #include <QSizeF>
 #include <QLineF>
+#include <QVariant>
 #include <QMap>
 
 #include <QXmlStreamReader>

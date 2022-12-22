@@ -39,6 +39,7 @@
 namespace BLOCKMOD {
 
 class Socket;
+class Block;
 class BlockItem;
 
 /*! Base class for sockets to be painted on a block item. */
@@ -54,8 +55,6 @@ public:
 
 	QRectF boundingRect() const override;
 
-	void setHoverEnabled(bool enabled);
-
 	/*! Returns pointer to socket. */
 	const Socket * socket() const { return m_socket; }
 
@@ -70,15 +69,14 @@ protected:
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
+	/*! The parent block that this socket belongs to. */
+	const Block	*m_block;
 
 	/*! Pointer to the socket data structure. */
 	Socket	*m_socket;
 
 	/*! The bounding rectangle of the symbol (updated whenever content of the socket changes). */
 	QRectF	m_symbolRect;
-
-	/*! If enabled, the mouse hover event is captured and m_hovered flag is adjusted. */
-	bool	m_hoverEnabled;
 
 	/*! Set to true, when mouse hovers over item.
 		Causes different pointing operation to be used.

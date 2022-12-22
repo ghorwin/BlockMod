@@ -249,7 +249,8 @@ QVariant BlockItem::itemChange(GraphicsItemChange change, const QVariant & value
 
 void BlockItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
 	SceneManager * sceneManager = qobject_cast<SceneManager *>(scene());
-	sceneManager->blockDoubleClicked(this);
+	if (sceneManager != nullptr) // protect against double click when inside block editor
+		sceneManager->blockDoubleClicked(this);
 	QGraphicsRectItem::mouseDoubleClickEvent(event);
 }
 

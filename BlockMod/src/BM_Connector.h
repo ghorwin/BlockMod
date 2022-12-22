@@ -36,6 +36,7 @@
 
 #include <QVector>
 #include <QPointF>
+#include <QColor>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
 
@@ -93,6 +94,15 @@ public:
 	QString			m_sourceSocket;
 	/*! ID of socket that polygon ends in, empty if not assigned. */
 	QString			m_targetSocket;
+
+	/*! Stores text that is displayed along with connector */
+	QString			m_text;
+
+	/*! Linewidth of drawn line */
+	double			m_linewidth = 0.8;
+
+	/*! Color of drawn line */
+	QColor			m_color = Qt::black;
 
 };
 
