@@ -25,8 +25,6 @@ private slots:
 
 	void on_toolButtonSave_clicked();
 
-	void on_pushButtonConnectSockets_clicked();
-
 	void on_pushButtonRemoveBlock_clicked();
 
 	void on_pushButtonRemoveConnection_clicked();

@@ -62,7 +62,7 @@ public:
 	/*! Writes network to file. */
 	void writeXML(const QString & fname) const;
 	/*! Flattens all ID names of sockets and blocks and checks for duplicates. */
-	void checkNames() const;
+	void checkNames(bool printNames=false) const;
 
 	/*! Tests, if the network has a block with a socket, both identified by socketVariableName in format
 		"<block>.<socketName>" and if this socket is an inlet socket or outlet socket (depending on inletSocket parameter).

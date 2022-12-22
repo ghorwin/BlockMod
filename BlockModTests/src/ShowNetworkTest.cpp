@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 		// Create and load network
 		BLOCKMOD::Network network;
 
-		const int GX = (const int)BLOCKMOD::Globals::GridSpacing;
+		int GX = (int)BLOCKMOD::Globals::GridSpacing;
 
 		// read network from file
 #if 0

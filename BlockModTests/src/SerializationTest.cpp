@@ -2,6 +2,7 @@
 #include <QFont>
 #include <QLocale>
 #include <QDebug>
+#include <QFile>
 
 #include <memory>
 #include <iostream>
@@ -18,23 +19,24 @@ int main(int argc, char *argv[]) {
 #endif
 
 	// create instance of network
-
 	BLOCKMOD::Network network;
-
-
 
 	// read network from file
 	try {
-		network.readXML("demo.bm");
+		if (QFile::exists("demo.bm")) {
+			network.readXML("demo.bm");
+			qDebug() << "Successfully read 'demo.bm'";
+			// show contant
+			network.checkNames(true);
+		}
 	}
 	catch (std::exception & ex) {
 		qDebug()  << ex.what();
-
+		return EXIT_FAILURE;
 	}
 
-	// show contant
-	network.checkNames();
 
+	qDebug() << "\nGenerating new Network";
 
 	// clear network
 	network = BLOCKMOD::Network();
@@ -109,6 +111,7 @@ int main(int argc, char *argv[]) {
 	// write network to file
 
 	network.writeXML("demo.bm");
+	qDebug() << "Successfully wrote 'demo.bm'";
 
 	// return exit code to environment
 	return EXIT_SUCCESS;

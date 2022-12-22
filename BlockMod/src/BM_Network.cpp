@@ -147,7 +147,7 @@ void Network::writeXML(const QString & fname) const {
 
 
 
-void Network::checkNames() const {
+void Network::checkNames(bool printNames) const {
 	QSet<QString> blockNames;
 	for (const Block & b : m_blocks) {
 		QString bName = b.m_name;
@@ -156,7 +156,8 @@ void Network::checkNames() const {
 		if (blockNames.contains(bName))
 			throw std::runtime_error("Duplicate Block ID name '"+bName.toStdString()+"'");
 		blockNames.insert(bName);
-//		qDebug() << bName;
+		if (printNames)
+			qDebug() << bName;
 		// now all sockets
 		QSet<QString> socketNames;
 		for (const Socket & s : b.m_sockets) {
@@ -165,7 +166,8 @@ void Network::checkNames() const {
 			if (socketNames.contains(sName))
 				throw std::runtime_error("Duplicate Socket ID name '"+sName.toStdString()+"' within block '"+bName.toStdString()+"'");
 			socketNames.insert(sName);
-//			qDebug() << sName;
+			if (printNames)
+				qDebug() << sName;
 		}
 	}
 	// check all connections for valid socket names

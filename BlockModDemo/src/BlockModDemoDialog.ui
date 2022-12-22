@@ -117,13 +117,6 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QPushButton" name="pushButtonConnectSockets">
-          <property name="text">
-           <string>Connect sockets</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="pushButtonRemoveConnection">
           <property name="text">
            <string>Remove connection</string>
