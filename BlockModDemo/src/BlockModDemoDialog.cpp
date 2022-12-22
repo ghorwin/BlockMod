@@ -6,6 +6,7 @@
 #include <QGridLayout>
 #include <QFileDialog>
 #include <QDebug>
+#include <QRandomGenerator>
 
 #include <BM_SceneManager.h>
 #include <BM_Network.h>
@@ -28,6 +29,9 @@ BlockModDemoDialog::BlockModDemoDialog(QWidget *parent) :
 	ui->graphicsView->setGridStep(80); // 80 pix/m; 8 pix/m for small grid
 
 	loadNetwork("demo.bm");
+
+	// TODO : reenable block editor once written
+	ui->groupBox_2->setVisible(false);
 }
 
 
@@ -103,37 +107,37 @@ void BlockModDemoDialog::on_pushButtonRemoveConnection_clicked() {
 void BlockModDemoDialog::on_pushButtonAddBlock_clicked() {
 	// generate a random block and add it to the scene
 	BLOCKMOD::Block b;
-	int len = 4+int(qrand()*4.0/RAND_MAX);
+	int len = 4+int(QRandomGenerator::global()->generateDouble()*4.0);
 	for (int i=0; i<len; ++i)
-		b.m_name.append('a'+int(qrand()*26.0/RAND_MAX));
+		b.m_name.append('a'+int(QRandomGenerator::global()->generateDouble()*26.0));
 
-	int gridX = len+4+int(qrand()*8.0/RAND_MAX);
-	int gridY = 3+int(qrand()*8.0/RAND_MAX);
+	int gridX = len+4+int(QRandomGenerator::global()->generateDouble()*8.0);
+	int gridY = 3+int(QRandomGenerator::global()->generateDouble()*8.0);
 
 	b.m_size = QSizeF(gridX*BLOCKMOD::Globals::GridSpacing, gridY*BLOCKMOD::Globals::GridSpacing);
-	b.m_pos = QPointF(int(qrand()*30.0/RAND_MAX)*BLOCKMOD::Globals::GridSpacing, int(qrand()*30.0/RAND_MAX)*BLOCKMOD::Globals::GridSpacing);
+	b.m_pos = QPointF(int(QRandomGenerator::global()->generateDouble()*30.0)*BLOCKMOD::Globals::GridSpacing, int(QRandomGenerator::global()->generateDouble()*30.0)*BLOCKMOD::Globals::GridSpacing);
 
 
 	// create and position sockets
 	for (int i=0; i<gridX-2; i+=2) {
-		bool haveSocket = qrand()*6.0/RAND_MAX < 1;
+		bool haveSocket = QRandomGenerator::global()->generateDouble()*6.0 < 1;
 		if (haveSocket) {
 			BLOCKMOD::Socket s;
-			s.m_inlet = qrand()*2.0/RAND_MAX < 1;
-			int slen = int(qrand()*6.0/RAND_MAX);
+			s.m_inlet = QRandomGenerator::global()->generateDouble()*2.0 < 1;
+			int slen = int(QRandomGenerator::global()->generateDouble()*6.0);
 			for (int i=0; i<slen; ++i)
-				s.m_name.append('a'+int(qrand()*26.0/RAND_MAX));
+				s.m_name.append('a'+int(QRandomGenerator::global()->generateDouble()*26.0));
 			s.m_orientation = Qt::Vertical;
 			s.m_pos = QPointF((i+1)*BLOCKMOD::Globals::GridSpacing, 0);
 			b.m_sockets.append(s);
 		}
-		haveSocket = qrand()*6.0/RAND_MAX < 1;
+		haveSocket = QRandomGenerator::global()->generateDouble()*6.0 < 1;
 		if (haveSocket) {
 			BLOCKMOD::Socket s;
-			s.m_inlet = qrand()*2.0/RAND_MAX < 1;
-			int slen = int(qrand()*6.0/RAND_MAX);
+			s.m_inlet = QRandomGenerator::global()->generateDouble()*2.0 < 1;
+			int slen = int(QRandomGenerator::global()->generateDouble()*6.0);
 			for (int i=0; i<slen; ++i)
-				s.m_name.append('a'+int(qrand()*26.0/RAND_MAX));
+				s.m_name.append('a'+int(QRandomGenerator::global()->generateDouble()*26.0));
 			s.m_orientation = Qt::Vertical;
 			s.m_pos = QPointF((i+1)*BLOCKMOD::Globals::GridSpacing, b.m_size.height());
 			b.m_sockets.append(s);
