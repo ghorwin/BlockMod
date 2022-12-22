@@ -2,6 +2,11 @@
 
 project( BlockMod )
 
+set(BlockMod_VERSION_MAJOR 1)
+set(BlockMod_VERSION_MINOR 1)
+set(BlockMod_VERSION_PATCH 0)
+set(BlockMod_VERSION ${BlockMod_VERSION_MAJOR}.${BlockMod_VERSION_MINOR}.${BlockMod_VERSION_PATCH})
+
 cmake_minimum_required( VERSION 2.8...3.10 )
 
 # enable @rpath on MacOS
@@ -11,6 +16,9 @@ cmake_policy(SET CMP0003 NEW)
 # Policy CMP0020: Automatically link Qt executables to qtmain target on Windows.
 cmake_policy(SET CMP0020 NEW)
 
+# allow either shared or static lib building, shared library is the default
+# Note: when using BlockMod within top-level project, move this line to top-level and comment it out here!
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 # Set default build type
 if (NOT CMAKE_BUILD_TYPE)
@@ -56,21 +64,32 @@ message("*** Building with Qt5, Version ${Qt5Widgets_VERSION} ***")
 
 
 # collect a list of all source files
-file( GLOB LIB_SRCS ${PROJECT_SOURCE_DIR}/../../src/*.cpp )
+file( GLOB LIB_SRCS ${PROJECT_SOURCE_DIR}/src/*.cpp )
 
 # collect a list of all header files (to be used in MOC compiler)
-file( GLOB LIB_HDRS ${PROJECT_SOURCE_DIR}/../../src/*.h )
+file( GLOB LIB_HDRS ${PROJECT_SOURCE_DIR}/src/*.h )
 
 
 include_directories(
-	${PROJECT_SOURCE_DIR}/../../src			# needed so that ui-generated header files find our own headers
+	${PROJECT_SOURCE_DIR}/src			# needed so that ui-generated header files find our own headers
 	${Qt5Widgets_INCLUDE_DIRS}
 )
 
 qt5_wrap_cpp( LIB_MOC_SRCS ${LIB_HDRS} )
 
 # add build target for library
-add_library( ${PROJECT_NAME} STATIC
+add_library( ${PROJECT_NAME}
 	${LIB_SRCS}
 	${LIB_MOC_SRCS}
 )
+
+# set version numbers when building as shared library
+set_target_properties(${PROJECT_NAME} PROPERTIES
+						VERSION ${BlockMod_VERSION}
+						SOVERSION ${BlockMod_VERSION_MAJOR}
+					 )
+
+# state that library need PIC when the default is shared libraries
+set_target_properties(${PROJECT_NAME} PROPERTIES
+						POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS}
+					 )
